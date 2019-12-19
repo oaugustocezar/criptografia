@@ -1,0 +1,7 @@
+ao compilar no arduino o código da criptografia, a biblioteca nativa do micro
+tinha uma variavel com o mesmo nome que a variavel utilizada pela biblioteca. 
+Foi alterada então o nome da variavel do codigo localizado em
+/home/augusto/Documentos/Arduino/arduino-1.8.10/hardware/arduino/avr/cores/arduino/USBAPI.h
+de u16 para u161. 
+
+
