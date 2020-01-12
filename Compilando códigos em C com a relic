@@ -1,0 +1,10 @@
+Para compilar códigos em C que utilizam a biblioteca Relic utilizar a seguinte estrutura:
+
+
+gcc <nomedorquivo.c> -L<local onde está o arquivo .a da biblioteca [relic-target/lib]> -lrelic_s -o nomedoarquivo
+
+
+Para a execução do arquivo já compilado 
+
+./nomedoarquivo
+
