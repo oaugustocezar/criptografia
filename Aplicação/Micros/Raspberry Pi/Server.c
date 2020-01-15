@@ -8,6 +8,78 @@
 #include <stdlib.h>
 
 #define MAX_MSG 1024
+#define BC_len 16
+
+
+int bc_aes_cbc_enc(uint8_t * out,int * out_len,uint8_t *mensagem,int key_len,uint8_t * key ,int output,uint8_t *iv);
+int bc_aes_cbc_dec(uint8_t * out,int * out_len,uint8_t *mensagem,int key_len,uint8_t * key ,int output,uint8_t *iv);
+
+
+uint8_t * enc (uint8_t * mensagem){
+	int outputsize = 32;
+	int out_len = 32;
+	/* A 128 bit key */
+	uint8_t  *key = "0123456789012345";
+
+    /* A 128 bit IV */
+	uint8_t *iv = "0123456789012345";
+
+     /* Buffer for the encrypted text */
+    
+	uint8_t *ciphertext = (uint8_t*) malloc(32 * sizeof(uint8_t));
+	
+	
+    // criptografando mensagem
+
+	if(bc_aes_cbc_enc(ciphertext,&outputsize,mensagem,16,key,BC_len,iv)){
+		printf("ERRO\n");
+
+	}else{
+		printf("Criptografado com sucesso\n");
+	}
+	
+	//printf("texto cifrado %s",ciphertext);
+
+	//printf("Outputsize %d\n", outputsize);
+	
+	return ciphertext;
+    
+    
+	}
+	
+uint8_t * dec (uint8_t * ciphertext){
+	
+	
+	int outputsize = 32;
+	int out_len = 32;
+	/* A 128 bit key */
+	uint8_t  *key = "0123456789012345";
+
+    /* A 128 bit IV */
+	uint8_t *iv = "0123456789012345";
+
+     /* Buffer for the decrypted text */
+    
+    
+	uint8_t *decryptedtext = (uint8_t*) malloc(32 * sizeof(uint8_t));
+    
+    
+    // decriptografando texto
+	if(bc_aes_cbc_dec(decryptedtext,&out_len,ciphertext,outputsize,key,BC_len,iv)){
+
+		printf("ERRO\n");
+
+	}else{
+		printf("\n\nDescriptografado com sucesso\n\n");
+	}
+
+	//printf("Decryptedtext: %s\n",decryptedtext);
+	
+	
+	return decryptedtext;
+	
+	
+	}
 
 /*
     Experimento 01
@@ -21,9 +93,10 @@ int main(void)
     //variaveis
     int socket_desc, conexao, c;
     struct sockaddr_in servidor, cliente;
-    char *mensagem;
+    uint8_t *mensagem;
     char resposta[MAX_MSG];
     int tamanho, count;
+    uint8_t *decryptedtext;
 
     // para pegar o IP e porta do cliente
     char *cliente_ip;
@@ -85,22 +158,29 @@ int main(void)
     // pegando IP e porta do cliente
     cliente_ip = inet_ntoa(cliente.sin_addr);
     cliente_port = ntohs(cliente.sin_port);
-    printf("cliente conectou\nIP:PORTA -> %s:%d\n", cliente_ip, cliente_port);
+    printf("\nCliente conectou\nIP:PORTA -> %s:%d\n", cliente_ip, cliente_port);
 
     // lendo dados enviados pelo cliente
-    if ((tamanho = read(conexao, resposta, MAX_MSG)) < 0)
+    if ((tamanho = read(conexao, resposta,BC_len*2 )) < 0)
     {
         perror("Erro ao receber dados do cliente: ");
         return -1;
     }
+    
+    decryptedtext = dec((uint8_t*)resposta);
+    
 
     // Coloca terminador de string
-    resposta[tamanho] = '\0';
-    printf("O cliente falou: %s\n", resposta);
+    decryptedtext[tamanho] = '\0';
+    printf("\nO cliente falou: %s\n\n", decryptedtext);
 
     // Enviando resposta para o cliente
-    mensagem = "Ola cliente, tudo bem?";
-    write(conexao, mensagem, strlen(mensagem));
+    mensagem = "Ola de volta!";
+    
+    uint8_t *ciphertext = enc(mensagem);
+    write(conexao, ciphertext, strlen(ciphertext));
+    
+    printf("\nDados enviados\n");
 
     /*********************************************************/
 

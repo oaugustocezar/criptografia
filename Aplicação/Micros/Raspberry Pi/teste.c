@@ -25,26 +25,26 @@
 #include <stdio.h>
 #include <string.h>
 #include <relic_bc.h> //  local onde está o include da lib
+#include <stdlib.h>
 //#include </home/pi/Documents/relic/include/relic_bc.h> //  local onde está o include da lib
 
 #define BC_len 16
 
-int main()
-{
+uint8_t * enc (uint8_t * mensagem){
 	int outputsize = 32;
 	int out_len = 32;
 	/* A 128 bit key */
 	uint8_t  *key = "0123456789012345";
 
     /* A 128 bit IV */
-    uint8_t *iv = "0123456789012345";
+	uint8_t *iv = "0123456789012345";
 
-     /* Buffer for the decrypted text */
-    uint8_t decryptedtext[32];
-    uint8_t ciphertext[32];
-    uint8_t* mensagem= "012345678901234";
-
-  // criptografando mensagem
+     /* Buffer for the encrypted text */
+    
+	uint8_t *ciphertext = (uint8_t*) malloc(32 * sizeof(uint8_t));
+	
+	
+    // criptografando mensagem
 
 	if(bc_aes_cbc_enc(ciphertext,&outputsize,mensagem,16,key,BC_len,iv)){
 		printf("ERRO\n");
@@ -52,10 +52,34 @@ int main()
 	}else{
 		printf("Criptografado com sucesso\n");
 	}
+	
+	//printf("texto cifrado %s",ciphertext);
 
-	printf("Outputsize %d\n", outputsize);
+	//printf("Outputsize %d\n", outputsize);
+	
+	return ciphertext;
+    
+    
+	}
+	
+uint8_t * dec (uint8_t * ciphertext){
+	
+	
+	int outputsize = 32;
+	int out_len = 32;
+	/* A 128 bit key */
+	uint8_t  *key = "0123456789012345";
 
-	// decriptografando texto
+    /* A 128 bit IV */
+	uint8_t *iv = "0123456789012345";
+
+     /* Buffer for the decrypted text */
+    
+    
+	uint8_t *decryptedtext = (uint8_t*) malloc(32 * sizeof(uint8_t));
+    
+    
+    // decriptografando texto
 	if(bc_aes_cbc_dec(decryptedtext,&out_len,ciphertext,outputsize,key,BC_len,iv)){
 
 		printf("ERRO\n");
@@ -65,6 +89,25 @@ int main()
 	}
 
 	printf("Decryptedtext: %s\n",decryptedtext);
+	return decryptedtext;
+	
+	
+	}
+
+int main()
+{
+	
+    uint8_t *decryptedtext;
+    uint8_t *ciphertext;
+    uint8_t *mensagem= "Mensagem";
+    
+    ciphertext = enc(mensagem);
+    
+    decryptedtext = dec(ciphertext);
+
+  
+
+	
 
 	return 0;
 }
