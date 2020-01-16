@@ -6,13 +6,13 @@
 #include <unistd.h>
 #include <string.h>
 #include <stdlib.h>
+#include <relic_bc.h>
 
 #define MAX_MSG 1024
 #define BC_len 16
 
 
-int bc_aes_cbc_enc(uint8_t * out,int * out_len,uint8_t *mensagem,int key_len,uint8_t * key ,int output,uint8_t *iv);
-int bc_aes_cbc_dec(uint8_t * out,int * out_len,uint8_t *mensagem,int key_len,uint8_t * key ,int output,uint8_t *iv);
+
 
 
 uint8_t * enc (uint8_t * mensagem){
