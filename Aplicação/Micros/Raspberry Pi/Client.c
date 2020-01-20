@@ -8,86 +8,36 @@
 #include <stdlib.h>
 #include <relic_bc.h>
 
-#define BC_len 16
 
 #define MAX_MSG 1024
-
-uint8_t * enc (uint8_t * mensagem){
-	int outputsize = 32;
-	int out_len = 32;
-	/* A 128 bit key */
-	uint8_t  *key = "0123456789012345";
-
-    /* A 128 bit IV */
-	uint8_t *iv = "0123456789012345";
-
-     /* Buffer for the encrypted text */
-    
-	uint8_t *ciphertext = (uint8_t*) malloc(32 * sizeof(uint8_t));
+#define key_len 16
+/*
 	
-	
-    // criptografando mensagem
+	Cliente envia mensagem ao servidor e imprime resposta
+	recebida do Servidor
+*/
 
-	if(bc_aes_cbc_enc(ciphertext,&outputsize,mensagem,16,key,BC_len,iv)){
-		printf("ERRO\n");
-
-	}else{
-		printf("\n\nCriptografado com sucesso\n\n");
-	}
-	
-	//printf("texto cifrado %s",ciphertext);
-
-	//printf("Outputsize %d\n", outputsize);
-	
-	return ciphertext;
-    
-    
-	}
-	
-uint8_t * dec (uint8_t * ciphertext){
-	
-	
-	int outputsize = 32;
-	int out_len = 32;
-	/* A 128 bit key */
-	uint8_t  *key = "0123456789012345";
-
-    /* A 128 bit IV */
-	uint8_t *iv = "0123456789012345";
-
-     /* Buffer for the decrypted text */
-    
-    
-	uint8_t *decryptedtext = (uint8_t*) malloc(32 * sizeof(uint8_t));
-    
-    
-    // decriptografando texto
-	if(bc_aes_cbc_dec(decryptedtext,&out_len,ciphertext,outputsize,key,BC_len,iv)){
-
-		printf("ERRO\n");
-
-	}else{
-		printf("\n\nDescriptografado com sucesso\n\n");
-	}
-
-	//printf("Decryptedtext: %s\n",decryptedtext);
-	
-	
-	return decryptedtext;
-	
-	
-	}
-
-
-int main(int argc, char *argv[])
+int main()
 {
 	// variaveis
 	int socket_desc;
 	struct sockaddr_in servidor;
-	uint8_t *mensagem;
+	uint8_t mensagem[MAX_MSG];
 	char resposta_servidor[MAX_MSG];
 	int tamanho;
-	uint8_t * ciphertext, *decryptedtext; 
+	uint8_t ip[15];
+	
+	/* A 128 bit key */
+	uint8_t  *key = "0123456789012345";
+
+    /* A 128 bit IV */
+	uint8_t *iv = "0123456789012345";
+	
+	int out_len, in_len;
+	
+	uint8_t ciphertext[MAX_MSG], decryptedtext[MAX_MSG];
+	
+	
 
 	/*****************************************/
 	/* Criando um socket */
@@ -100,7 +50,11 @@ int main(int argc, char *argv[])
 	// IP do servidor
 	// familia ARPANET
 	// Porta - hton = host to network short (2bytes)
-	servidor.sin_addr.s_addr = inet_addr("127.0.0.1");
+	
+	printf("\nInsira o IP do nó servidor:\n");
+	fgets(ip,15,stdin);
+	fflush(stdin);
+	servidor.sin_addr.s_addr = inet_addr(ip);
 	servidor.sin_family = AF_INET;
 	servidor.sin_port = htons(1234);
 
@@ -121,35 +75,59 @@ int main(int argc, char *argv[])
 	// 3 - Servidor envia resposta
 
 
+
+
 	//Enviando uma mensagem
-	mensagem = "Oi servidor"; 
-	//criptografando a mensagem
-	ciphertext=enc (mensagem);
 	
 	
 	
-	if (send(socket_desc, ciphertext, strlen(ciphertext), 0) < 0)
+	printf("Insira uma mensagem para enviar ao servidor:\n\n");
+	fgets(mensagem,MAX_MSG,stdin);
+	
+	
+	
+	in_len = strlen(mensagem);
+	
+	printf("\nTamanho da mensagem %d\n", in_len);
+	
+	
+	
+	if(bc_aes_cbc_enc(ciphertext,&out_len,mensagem,in_len,key,key_len,iv)){
+		printf("ERRO\n");
+		
+
+	}else{
+		printf("\n\nCriptografado com sucesso\n\n");
+	}
+	
+	
+
+	if (send(socket_desc, &out_len, strlen(mensagem), 0) < 0) // envia o tamanho do buffer para descriptografar no server
+	{
+		printf("Erro ao enviar mensagem\n");
+		return -1;
+	}
+	puts("Tamanho do buffer enviado\n");
+	
+	
+	if (send(socket_desc, ciphertext, MAX_MSG, 0) < 0)  // envia o texto cifrado para  server
 	{
 		printf("Erro ao enviar mensagem\n");
 		return -1;
 	}
 	puts("Dados enviados\n");
+	
+	
 
 	//Recebendo resposta do servidor
-	if ((tamanho = recv(socket_desc, resposta_servidor, BC_len*2, 0)) < 0)
+	if ((tamanho = recv(socket_desc, resposta_servidor, MAX_MSG, 0)) < 0)
 	{
 		printf("Falha ao receber resposta\n");
 		return -1;
 	}
-	printf("\nResposta recebida: ");
-	
-	
-	
-	decryptedtext = dec((uint8_t*)resposta_servidor);
-	
-	decryptedtext[tamanho] = '\0'; // adicionando fim de linha na string
-	printf("\nReposta do Servidor: ");
-	puts(decryptedtext);
+	printf("Resposta recebida: ");
+	resposta_servidor[tamanho] = '\0'; // adicionando fim de linha na string
+	puts(resposta_servidor);
 
 	/*****************************************/
 	close(socket_desc); // fechando o socket

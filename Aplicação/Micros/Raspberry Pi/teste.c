@@ -1,112 +1,63 @@
-/*
- * teste.c
- *
- * Copyright 2020  <pi@raspberrypi>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
- * MA 02110-1301, USA.
- *
- *
- */
-
 
 #include <stdio.h>
 #include <string.h>
-#include <relic_bc.h> //  local onde está o include da lib
+#include <relic_bc.h> 
 #include <stdlib.h>
-//#include </home/pi/Documents/relic/include/relic_bc.h> //  local onde está o include da lib
 
-#define BC_len 16
+#define key_len 16
+#define max_msg 1024
 
-uint8_t * enc (uint8_t * mensagem){
-	int outputsize = 32;
-	int out_len = 32;
-	/* A 128 bit key */
-	uint8_t  *key = "0123456789012345";
 
-    /* A 128 bit IV */
-	uint8_t *iv = "0123456789012345";
-
-     /* Buffer for the encrypted text */
-    
-	uint8_t *ciphertext = (uint8_t*) malloc(32 * sizeof(uint8_t));
-	
-	
-    // criptografando mensagem
-
-	if(bc_aes_cbc_enc(ciphertext,&outputsize,mensagem,16,key,BC_len,iv)){
-		printf("ERRO\n");
-
-	}else{
-		printf("Criptografado com sucesso\n");
-	}
-	
-	//printf("texto cifrado %s",ciphertext);
-
-	//printf("Outputsize %d\n", outputsize);
-	
-	return ciphertext;
-    
-    
-	}
-	
-uint8_t * dec (uint8_t * ciphertext){
-	
-	
-	int outputsize = 32;
-	int out_len = 32;
-	/* A 128 bit key */
-	uint8_t  *key = "0123456789012345";
-
-    /* A 128 bit IV */
-	uint8_t *iv = "0123456789012345";
-
-     /* Buffer for the decrypted text */
-    
-    
-	uint8_t *decryptedtext = (uint8_t*) malloc(32 * sizeof(uint8_t));
-    
-    
-    // decriptografando texto
-	if(bc_aes_cbc_dec(decryptedtext,&out_len,ciphertext,outputsize,key,BC_len,iv)){
-
-		printf("ERRO\n");
-
-	}else{
-		printf("Descriptografado com sucesso\n");
-	}
-
-	printf("Decryptedtext: %s\n",decryptedtext);
-	return decryptedtext;
-	
-	
-	}
 
 int main()
 {
 	
-    uint8_t *decryptedtext;
-    uint8_t *ciphertext;
-    uint8_t *mensagem= "Mensagem";
-    
-    ciphertext = enc(mensagem);
-    
-    decryptedtext = dec(ciphertext);
+    /* A 128 bit key */
+	uint8_t  *key = "0123456789012345";
 
+    /* A 128 bit IV */
+	uint8_t *iv = "0123456789012345";
+	
+	int out_len, in_len;
+	
+	uint8_t ciphertext[max_msg], decryptedtext[max_msg];
+	
+	
   
 
+	uint8_t *mensagem; 
+	
+	mensagem = "isto e um teste de tamanho de mensagem criptografada e agora eu posso mandar mensagens grandes\n\n";
+	
+	in_len = strlen(mensagem);
+		
+	
+
+	if(bc_aes_cbc_enc(ciphertext,&out_len,mensagem,in_len,key,key_len,iv)){
+		printf("ERRO\n");
+		
+
+	}else{
+		printf("\n\nCriptografado com sucesso\n\n");
+	}
+	
+	in_len = out_len;
+	
+	if(bc_aes_cbc_dec(decryptedtext,&out_len,ciphertext,in_len,key,key_len,iv)){
+		printf("ERRO\n");
+		
+
+	}else{
+		printf("\n\nDescriptografado com sucesso\n\n");
+	}
+	
+	printf("A mensagem eh: %s\n",decryptedtext);	
+	
+	fflush(stdin);
+	
+	uint8_t teste[max_msg] = "10";
+	
+	printf(" teatando %d",atoi(teste));
 	
 
 	return 0;
