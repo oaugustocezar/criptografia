@@ -11,7 +11,7 @@
 
 
 
-#define MAX_MSG 1024
+#define MAX_MSG 102400
 #define key_len 16
 
 typedef struct {
