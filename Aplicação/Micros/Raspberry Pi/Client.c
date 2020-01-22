@@ -15,7 +15,16 @@
 	
 	Cliente envia mensagem ao servidor e imprime resposta
 	recebida do Servidor
+	
 */
+
+	typedef struct {
+		
+		int16_t buffer; 
+		uint8_t crypto[MAX_MSG];
+		clock_t tempo;
+		
+		}estrutura;
 
 int main()
 {
@@ -25,6 +34,7 @@ int main()
 	uint8_t mensagem[MAX_MSG];
 	char resposta_servidor[MAX_MSG];
 	int tamanho;
+	estrutura dados;
 	uint8_t ip[15];
 	
 	/* A 128 bit key */
@@ -33,7 +43,8 @@ int main()
     /* A 128 bit IV */
 	uint8_t *iv = "0123456789012345";
 	
-	int out_len, in_len;
+	int out_len = MAX_MSG;
+	int in_len;
 	
 	uint8_t ciphertext[MAX_MSG], decryptedtext[MAX_MSG];
 	
@@ -81,6 +92,8 @@ int main()
 	
 	
 	
+	
+	
 	printf("Insira uma mensagem para enviar ao servidor:\n\n");
 	fgets(mensagem,MAX_MSG,stdin);
 	
@@ -92,7 +105,7 @@ int main()
 	
 	
 	
-	if(bc_aes_cbc_enc(ciphertext,&out_len,mensagem,in_len,key,key_len,iv)){
+	if(bc_aes_cbc_enc(dados.crypto,&out_len,mensagem,in_len,key,key_len,iv)){
 		printf("ERRO\n");
 		
 
@@ -100,17 +113,22 @@ int main()
 		printf("\n\nCriptografado com sucesso\n\n");
 	}
 	
+	 
+	dados.buffer = out_len; 
+	
+	
+	//printf("Tamanho do buffer %d %d", out_len, dados.buffer);	
 	
 
-	if (send(socket_desc, &out_len, strlen(mensagem), 0) < 0) // envia o tamanho do buffer para descriptografar no server
-	{
-		printf("Erro ao enviar mensagem\n");
-		return -1;
-	}
-	puts("Tamanho do buffer enviado\n");
+	//if (send(socket_desc, &out_len, strlen(mensagem), 0) < 0) // envia o tamanho do buffer para descriptografar no server
+	//{
+		//printf("Erro ao enviar mensagem\n");
+		//return -1;
+	//}
+	//puts("Tamanho do buffer enviado\n");
 	
 	
-	if (send(socket_desc, ciphertext, MAX_MSG, 0) < 0)  // envia o texto cifrado para  server
+	if (send(socket_desc, &dados, MAX_MSG, 0) < 0)  // envia o texto cifrado para  server
 	{
 		printf("Erro ao enviar mensagem\n");
 		return -1;

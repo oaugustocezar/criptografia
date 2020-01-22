@@ -14,6 +14,15 @@
 #define MAX_MSG 1024
 #define key_len 16
 
+typedef struct {
+		
+		int16_t buffer; 
+		uint8_t crypto[MAX_MSG];
+        clock_t tempo;
+		
+		}estrutura;
+
+
 
 /*
     Servidor aguarda por mensagem do cliente, imprime na tela
@@ -27,13 +36,15 @@ int main(void)
     struct sockaddr_in servidor, cliente;
     uint8_t *mensagem;
     int tamanho, count;
+    estrutura dados;
     	/* A 128 bit key */
 	uint8_t  *key = "0123456789012345";
 
     /* A 128 bit IV */
 	uint8_t *iv = "0123456789012345";
 	
-	int out_len, in_len,t1,t2;
+	int out_len = MAX_MSG;
+    int in_len;
 	
 	uint8_t ciphertext[MAX_MSG], decryptedtext[MAX_MSG];
     
@@ -99,23 +110,32 @@ int main(void)
     cliente_ip = inet_ntoa(cliente.sin_addr);
     cliente_port = ntohs(cliente.sin_port);
     printf("cliente conectou\nIP:PORTA -> %s:%d\n", cliente_ip, cliente_port);
+    
+    fflush(stdin);
 
     // lendo dados enviados pelo cliente
-    if ((tamanho = read(conexao, &in_len, MAX_MSG)) < 0)
+    //if ((tamanho = read(conexao, &in_len, 16)) < 0)
+    //{
+        //perror("Erro ao receber dados do cliente: ");
+        //return -1;
+    //}
+    
+    //printf("Tamanho recebido %d,", in_len);
+    
+        
+    
+    if ((tamanho = read(conexao, &dados, MAX_MSG)) < 0)
     {
         perror("Erro ao receber dados do cliente: ");
         return -1;
     }
     
-    
-    if ((tamanho = read(conexao, ciphertext, MAX_MSG)) < 0)
-    {
-        perror("Erro ao receber dados do cliente: ");
-        return -1;
-    }
+    printf("Tamanho do cipher %d", dados.buffer);
     
     
-    if(bc_aes_cbc_dec(decryptedtext,&out_len,ciphertext,in_len,key,key_len,iv)){
+    
+    
+    if(bc_aes_cbc_dec(decryptedtext,&out_len,dados.crypto,dados.buffer,key,key_len,iv)){
 		printf("ERRO\n");
 		
 
