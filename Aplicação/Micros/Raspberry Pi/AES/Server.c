@@ -9,19 +9,10 @@
 #include <relic_bc.h>
 #include <time.h> 
 #include <locale.h>
+#include "crypto_rasp.h"
 
 
 
-#define MAX_MSG 102400
-#define key_len 16
-
-typedef struct {
-		
-		int16_t buffer; 
-		uint8_t crypto[MAX_MSG];
-        clock_t tempo;
-		
-		}estrutura;
 
 
 
@@ -44,13 +35,13 @@ void socketServer (int * socket_desc, int *conexao)
     int reuso = 1;
     if (setsockopt(*socket_desc, SOL_SOCKET, SO_REUSEADDR, (const char *)&reuso, sizeof(reuso)) < 0)
     {
-        perror("NÃ£o foi possÃ­vel reusar endereÃ§o");
+        perror("Não foi possível reusar endereço");
         
     }
 #ifdef SO_REUSEPORT
     if (setsockopt(*socket_desc, SOL_SOCKET, SO_REUSEPORT, (const char *)&reuso, sizeof(reuso)) < 0)
     {
-        perror("NÃ£o foi possÃ­vel reusar porta");
+        perror("Não foi possível reusar portas");
         
     }
     
@@ -158,14 +149,12 @@ void enc (estrutura * dados, uint8_t *mensagem, uint8_t *key, uint8_t *iv)
 		 
 		}
         
-        void enviaMsgClient(estrutura * dados, int * conexao){
-            
-            write(*conexao, &dados->crypto, MAX_MSG);
-            
-            
-            
-            
-            }
+void enviaMsgClient(estrutura * dados, int * conexao)
+{
+    
+    write(*conexao, &dados->crypto, MAX_MSG);
+
+}
 
 int main(void)
 {

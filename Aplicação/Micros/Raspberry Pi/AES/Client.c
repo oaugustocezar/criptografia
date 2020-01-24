@@ -9,10 +9,10 @@
 #include <relic_bc.h>
 #include <time.h> 
 #include <locale.h>
+#include "crypto_rasp.h"
 
 
-#define MAX_MSG 102400
-#define key_len 16
+
 /*
 	
 	Cliente envia mensagem ao servidor e imprime resposta
@@ -20,16 +20,11 @@
 	
 */
 
-	typedef struct {
-		
-		int16_t buffer; 
-		uint8_t crypto[MAX_MSG];
-		clock_t tempo;
-		
-		}estrutura;
-		
 
- void socketClient (int * socket_desc){
+	
+
+ void socketClient (int * socket_desc)
+ {
 	 
 	 uint8_t ip[15];
 	 
@@ -61,91 +56,96 @@
 	}
 	printf("Conectado no servidor\n");
 	
-	 }	
+}	
 	 
-	 void enviaMsgServer (int * socket_desc, estrutura *dados){
-		 
+ void enviaMsgServer (int * socket_desc, estrutura *dados)
+{
+	 
 	if (send(*socket_desc, dados, MAX_MSG, 0) < 0)  // envia o texto cifrado para  server
 	{
 		printf("Erro ao enviar mensagem\n");
 		exit(1);
 	}
 	puts("Dados enviados\n");
-		 }
+}
 	 
-	 void enc (estrutura * dados, uint8_t *mensagem, uint8_t *key, uint8_t *iv)
-	 {
-		 int out_len = MAX_MSG;
-		int in_len;
-		 
-		 in_len = strlen(mensagem);
-		 
-		 if(bc_aes_cbc_enc(dados->crypto,&out_len,mensagem,in_len,key,key_len,iv)){
+ void enc (estrutura * dados, uint8_t *mensagem, uint8_t *key, uint8_t *iv)
+ {
+	int out_len = MAX_MSG;
+	int in_len;
+	 
+	in_len = strlen(mensagem);
+	 
+	 if(bc_aes_cbc_enc(dados->crypto,&out_len,mensagem,in_len,key,key_len,iv)) /* o texto é passado em mensagem e seu tamanho em in_len
+	 o texto criptografado é armazenado em dados->crypto e o tamanho da saida em out_len*/
+	{
+
 		printf("ERRO\n");
 		exit(1);
-		
 
-		}else{
-		printf("\n\nCriptografado com sucesso\n\n");
+	}
+	
+	else
+	{
+	printf("\n\nCriptografado com sucesso\n\n");
+
 	}
 	
 	 
-		dados->buffer = out_len; 
-		 
+	dados->buffer = out_len; 
+		 		 
+}
 		
-		 
-		}
-		
-void recebeMsg(int * socket_desc, estrutura *dados){
-			
+void recebeMsg(int * socket_desc, estrutura *dados)
+{
+
 	int tamanho;
-	
-					
-	if ((tamanho = recv(*socket_desc, dados->crypto, MAX_MSG, 0)) < 0)
+						
+	if ((tamanho = recv(*socket_desc, dados->crypto, MAX_MSG, 0)) < 0) /* envia os bytes em dados->crypto*/
 	{
 		printf("Falha ao receber resposta\n");
 		exit(1);
-		
-		
+			
 	}
 	printf("Resposta recebida:");
-	dados->buffer = strlen(dados->crypto);
-	
-	
-	
-	
-			
-			
-			}
+
+	dados->buffer = strlen(dados->crypto); /*atribui o tamanho do buffer*/
+				
+}
 			
  void fechaSocket (int * socket_desc)
- {
-	 close(*socket_desc); // fechando o socket
 
-		printf("Cliente finalizado com sucesso!\n");
-	 }
+{
 
- void dec (estrutura * dados, uint8_t *iv, uint8_t *key)
+	close(*socket_desc); // fechando o socket
+
+	printf("Cliente finalizado com sucesso!\n");
+}
+
+
+void dec (estrutura * dados, uint8_t *iv, uint8_t *key)
+{
+
+    uint8_t decryptedtext[MAX_MSG]; 
+    int out_len = MAX_MSG;
+    
+    if(bc_aes_cbc_dec(decryptedtext,&out_len,dados->crypto,dados->buffer,key,key_len,iv)) /*  descriptografa, passando o texto cifrado
+    em dados->buffer e o tamanho em dados->buffer, armazena o texto puro em decryptedtext e o seu tamanho em out_len */
     {
-        uint8_t decryptedtext[MAX_MSG]; 
-        int out_len = MAX_MSG;
-        
-        if(bc_aes_cbc_dec(decryptedtext,&out_len,dados->crypto,dados->buffer,key,key_len,iv)){
 		printf("ERRO\n");
-		
+	
 
-	}else{
+	}
+	else
+	{
 		printf("\n\nDescriptografado com sucesso\n\n");
 	}
-    
-    
 
-    // Coloca terminador de string
-    decryptedtext[out_len] = '\0';
-    printf("O cliente falou: %s\n", decryptedtext);
+
+    decryptedtext[out_len] = '\0'; // Coloca terminador de string
+    printf("O cliente falou: %s\n", decryptedtext); 
         
-        }
-        
+ }      
         
 
 int main()
@@ -156,7 +156,7 @@ int main()
 	// variaveis
 	int socket_desc;	
 	uint8_t mensagem[MAX_MSG];
-	estrutura dados;
+	estrutura dados; 
 	
 	
 	uint8_t  *key = "0123456789012345"; /* A 128 bit key */
