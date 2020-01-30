@@ -110,7 +110,7 @@ void leMsg(int * conexao, estrutura *dados)
         uint8_t decryptedtext[MAX_MSG]; 
         int out_len = MAX_MSG;
         
-        if(bc_aes_cbc_dec(decryptedtext,&out_len,dados->crypto,dados->buffer,key,key_len,iv)){
+        if(bc_aes_cbc_dec(dados->decryptedtext,&out_len,dados->crypto,dados->buffer,key,key_len,iv)){
 		printf("ERRO\n");
 		
 
@@ -122,7 +122,8 @@ void leMsg(int * conexao, estrutura *dados)
 
     // Coloca terminador de string
     decryptedtext[out_len] = '\0';
-    printf("O cliente falou: %s\n", decryptedtext);
+    
+    printf("O cliente falou: %s\n",dados->decryptedtext );
         
         }
 
@@ -163,6 +164,7 @@ int main(void)
     
     //variaveis
     
+    FILE *pont_arq;    
     
     int socket_desc, conexao,in_len;
     int out_len = MAX_MSG;
@@ -183,13 +185,38 @@ int main(void)
     
     leMsg(&conexao,&dados); // lê mensagens enviadas pelo cliente
     
+    gettimeofday(&utime, NULL);
+	T2 = utime.tv_sec + ( utime.tv_usec / 1000000.0 );
+    
     dec(&dados,iv,key); // descriptografa mensagens recebidas e exibe o texto 
+    
+    gettimeofday(&utime, NULL);
+
+    T3 = utime.tv_sec + ( utime.tv_usec / 1000000.0 );
+    pont_arq = fopen("tempos_exec.txt", "a");
+    fprintf(pont_arq, "%s", "Tempo decriptografia server em ms:");
+    fprintf(pont_arq, "%.10lf\n", T3 - T2);
+    fclose(pont_arq);
 
        
-    printf("Insira uma resposta para enviar ao cliente:\n\n");
-	fgets(mensagem,MAX_MSG,stdin); 
+    //printf("Insira uma resposta para enviar ao cliente:\n\n");
+	//fgets(mensagem,MAX_MSG,stdin); 
     
-    enc(&dados, mensagem,key,iv);     // criptografa mensagem 
+    gettimeofday(&utime, NULL);
+	T4 = utime.tv_sec + ( utime.tv_usec / 1000000.0 );
+    
+    enc(&dados, dados.decryptedtext,key,iv);     // criptografa mensagem 
+    
+    gettimeofday(&utime, NULL);
+
+    T5 = utime.tv_sec + ( utime.tv_usec / 1000000.0 );
+    pont_arq = fopen("tempos_exec.txt", "a");
+
+    fprintf(pont_arq, "%s", "Tempo criptografia server em ms::");
+    fprintf(pont_arq, "%.10lf\n", T5- T4);
+    fclose(pont_arq);
+
+    dados.DIFF_Server = T5 - T2 ;  
     
     enviaMsgClient(&dados,&conexao); // envia mensagem para o cliente 
 

@@ -7,7 +7,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <relic_bc.h>
-#include <time.h> 
+#include <sys/time.h> 
 #include <locale.h>
 #include "crypto_rasp.h"
 
@@ -155,9 +155,9 @@ int main()
 	
 	// variaveis
 	int socket_desc;	
-	uint8_t mensagem[MAX_MSG];
 	estrutura dados; 
-	
+	FILE *pont_arq;
+
 	
 	uint8_t  *key = "0123456789012345"; /* A 128 bit key */
 
@@ -169,15 +169,51 @@ int main()
 	
 	
 	printf("Insira uma mensagem para enviar ao servidor:\n\n");
-	fgets(mensagem,MAX_MSG,stdin);
+	fgets(dados.decryptedtext,MAX_MSG,stdin);
 	
-	enc(&dados,mensagem,key,iv); // criptografa mensagem 
+	gettimeofday(&utime, NULL);
+	T0 = utime.tv_sec + ( utime.tv_usec / 1000000.0 );
+	
+	enc(&dados,dados.decryptedtext,key,iv); // criptografa mensagem 
+	
+	gettimeofday(&utime, NULL);
+
+    T1 = utime.tv_sec + ( utime.tv_usec / 1000000.0 );
+    
+	pont_arq = fopen("tempos_exec.txt", "a");	
+    fprintf(pont_arq, "%s", "Tempo criptografia cliente em ms: ");
+    fprintf(pont_arq, "%.10lf\n", T1 - T0);
+    fclose(pont_arq);
+    
+    
+    
 	
 	enviaMsgServer(&socket_desc,&dados); // envia mensagem para o servidor
 		
 	
 	recebeMsg(&socket_desc,&dados); //Recebendo resposta do servidor
-	dec(&dados, iv, key);
+	
+	
+	gettimeofday(&utime, NULL); 
+	T6 = utime.tv_sec + ( utime.tv_usec / 1000000.0 ); 
+	
+	
+	dec(&dados, iv, key); // decriptografa mensagem 
+	
+	gettimeofday(&utime, NULL);
+
+    T7 = utime.tv_sec + ( utime.tv_usec / 1000000.0 );
+    
+	pont_arq = fopen("tempos_exec.txt", "a");
+    fprintf(pont_arq, "%s", "Tempo decriptografia cliente em ms:");
+    fprintf(pont_arq, "%.10lf\n", T7 - T6);
+    fclose(pont_arq);
+    
+    pont_arq = fopen("tempos_exec.txt", "a");
+    fprintf(pont_arq, "%s", "Tempo de envio entre os nós em ms:");
+    fprintf(pont_arq, "%.10lf\n------------------------------------------------\n", (T6-T1-(dados.DIFF_Server)/2));
+    fclose(pont_arq);
+
 	
 	fechaSocket(&socket_desc); // encerra a comunicação	
 

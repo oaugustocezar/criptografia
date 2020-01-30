@@ -1,0 +1,24 @@
+Tempo criptografia cliente em ms: 0.0000760555
+Tempo decriptografia server em ms:0.0001938343
+Tempo criptografia server em ms::0.0000619888
+Tempo decriptografia cliente em ms:0.0001831055
+Tempo de envio entre os nós em ms:0.0022869110
+------------------------------------------------
+Tempo criptografia cliente em ms: 0.0000741482
+Tempo decriptografia server em ms:0.0001480579
+Tempo criptografia server em ms::0.0000550747
+Tempo decriptografia cliente em ms:0.0001661777
+Tempo de envio entre os nós em ms:0.0015838146
+------------------------------------------------
+Tempo criptografia cliente em ms: 0.0000739098
+Tempo decriptografia server em ms:0.0001521111
+Tempo criptografia server em ms::0.0000531673
+Tempo decriptografia cliente em ms:0.0001349449
+Tempo de envio entre os nós em ms:0.0015540123
+------------------------------------------------
+Tempo criptografia cliente em ms: 0.0000979900
+Tempo decriptografia server em ms:0.0001518726
+Tempo criptografia server em ms::0.0000579357
+Tempo decriptografia cliente em ms:0.0001740456
+Tempo de envio entre os nós em ms:0.0019428730
+------------------------------------------------
