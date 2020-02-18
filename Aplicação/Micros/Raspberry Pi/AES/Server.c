@@ -98,58 +98,17 @@ void leMsg(int * conexao, estrutura *dados)
     
     if ((tamanho = read(*conexao, dados, MAX_MSG)) < 0)
     {
-        perror("Erro ao receber dados do cliente: ");
+        if(DEBUG)
+            perror("Erro ao receber dados do cliente: ");
         
     }
     
     
     }
     
-    void dec (estrutura * dados, uint8_t *iv, uint8_t *key)
-    {
-        uint8_t decryptedtext[MAX_MSG]; 
-        int out_len = MAX_MSG;
-        
-        if(bc_aes_cbc_dec(dados->decryptedtext,&out_len,dados->crypto,dados->buffer,key,key_len,iv)){
-		printf("ERRO\n");
-		
 
-	}else{
-		printf("\n\nDescriptografado com sucesso\n\n");
-	}
-    
-    
 
-    // Coloca terminador de string
-    decryptedtext[out_len] = '\0';
-    
-    printf("O cliente falou: %s\n",dados->decryptedtext );
-        
-        }
 
-void enc (estrutura * dados, uint8_t *mensagem, uint8_t *key, uint8_t *iv)
-	 {
-		 int out_len = MAX_MSG;
-		int in_len;
-		 
-		 in_len = strlen(mensagem);
-		 
-		 if(bc_aes_cbc_enc(dados->crypto,&out_len,mensagem,in_len,key,key_len,iv)){
-		printf("ERRO\n");
-		exit(1);
-		
-
-		}else{
-		printf("\n\nCriptografado com sucesso\n\n");
-	}
-	
-	 
-		dados->buffer = out_len; 
-		 
-		
-		 
-		}
-        
 void enviaMsgClient(estrutura * dados, int * conexao)
 {
     
@@ -172,13 +131,8 @@ int main(void)
     uint8_t mensagem[MAX_MSG];
     estrutura dados;
     
-   	uint8_t ciphertext[MAX_MSG]; /* buffer para mensagens criptografadas e descriptografadas */
-    
-    uint8_t  *key = "0123456789012345";  /* A 128 bit key */
+   	
 
-    
-	uint8_t *iv = "0123456789012345"; /* A 128 bit IV */
-    
     
     
     socketServer(&socket_desc,&conexao); // cria e inicializa o socket, atribui endereços e escuta conexões  
@@ -188,15 +142,12 @@ int main(void)
     gettimeofday(&utime, NULL);
 	T2 = utime.tv_sec + ( utime.tv_usec / 1000000.0 );
     
-    dec(&dados,iv,key); // descriptografa mensagens recebidas e exibe o texto 
+    dec(&dados); // descriptografa mensagens recebidas e exibe o texto 
     
     gettimeofday(&utime, NULL);
 
     T3 = utime.tv_sec + ( utime.tv_usec / 1000000.0 );
-    pont_arq = fopen("tempos_exec.txt", "a");
-    fprintf(pont_arq, "%s", "Tempo decriptografia server em ms:");
-    fprintf(pont_arq, "%.10lf\n", T3 - T2);
-    fclose(pont_arq);
+   
 
        
     //printf("Insira uma resposta para enviar ao cliente:\n\n");
@@ -205,16 +156,12 @@ int main(void)
     gettimeofday(&utime, NULL);
 	T4 = utime.tv_sec + ( utime.tv_usec / 1000000.0 );
     
-    enc(&dados, dados.decryptedtext,key,iv);     // criptografa mensagem 
+    enc(&dados,dados.decryptedtext);     // criptografa mensagem 
     
     gettimeofday(&utime, NULL);
 
     T5 = utime.tv_sec + ( utime.tv_usec / 1000000.0 );
-    pont_arq = fopen("tempos_exec.txt", "a");
-
-    fprintf(pont_arq, "%s", "Tempo criptografia server em ms::");
-    fprintf(pont_arq, "%.10lf\n", T5- T4);
-    fclose(pont_arq);
+    
 
     dados.DIFF_Server = T5 - T2 ;  
     
@@ -222,7 +169,16 @@ int main(void)
 
         
     
+    pont_arq = fopen("tempos_exec.txt", "a");
 
+
+    fprintf(pont_arq, "%s", "Tempo decriptografia server em ms:");
+    fprintf(pont_arq, "%.10lf\n", T3 - T2);
+    
+
+    fprintf(pont_arq, "%s", "Tempo criptografia server em ms::");
+    fprintf(pont_arq, "%.10lf\n", T5- T4);
+    fclose(pont_arq);
     
 
     close(socket_desc);
