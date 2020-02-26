@@ -139,17 +139,19 @@ int main()
 
     T7 = utime.tv_sec + ( utime.tv_usec / 1000000.0 );
 
-    pont_arq = fopen("tempos_exec.txt", "a");
+    pont_arq = fopen("tempos_exec.csv", "a");
 
-    fprintf(pont_arq, "%s", "Tempo criptografia cliente em ms: ");
-    fprintf(pont_arq, "%.10lf\n", T1 - T0);
+    //fprintf(pont_arq, "%s","Tempo criptografia cliente:,");
+
+    
+    fprintf(pont_arq, "%.10lf,", T1 - T0);
         
 	
-    fprintf(pont_arq, "%s", "Tempo decriptografia cliente em ms:");
-    fprintf(pont_arq, "%.10lf\n", T7 - T6);
+    //fprintf(pont_arq, "%s", "Tempo decriptografia cliente em ms:,");
+    fprintf(pont_arq, "%.10lf,", T7 - T6);
         
-    fprintf(pont_arq, "%s", "Tempo de envio entre os nós em ms:");
-    fprintf(pont_arq, "%.10lf\n------------------------------------------------\n", (T6-T1-(dados.DIFF_Server)/2));
+    //fprintf(pont_arq, "%s", "Tempo de envio entre os nós em ms:\n");
+    fprintf(pont_arq, "%.10lf\n", (T6-T1-(dados.DIFF_Server)/2));
     fclose(pont_arq);
 
 	

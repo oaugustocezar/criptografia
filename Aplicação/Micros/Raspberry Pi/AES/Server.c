@@ -169,15 +169,15 @@ int main(void)
 
         
     
-    pont_arq = fopen("tempos_exec.txt", "a");
+    pont_arq = fopen("tempos_exec.csv", "a");
 
 
-    fprintf(pont_arq, "%s", "Tempo decriptografia server em ms:");
-    fprintf(pont_arq, "%.10lf\n", T3 - T2);
+    //fprintf(pont_arq, "%s", "Tempo decriptografia server em ms:,");
+    fprintf(pont_arq, "%.10lf,", T3 - T2);
     
 
-    fprintf(pont_arq, "%s", "Tempo criptografia server em ms::");
-    fprintf(pont_arq, "%.10lf\n", T5- T4);
+    //fprintf(pont_arq, "%s", "Tempo criptografia server em ms:,");
+    fprintf(pont_arq, "%.10lf,", T5- T4);
     fclose(pont_arq);
     
 
