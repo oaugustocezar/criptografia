@@ -1,14 +1,3 @@
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <arpa/inet.h>
-#include <netinet/in.h>
-#include <stdio.h>
-#include <unistd.h>
-#include <string.h>
-#include <stdlib.h>
-#include <relic_bc.h>
-#include <time.h> 
-#include <locale.h>
 #include "crypto_rasp.h"
 
 
@@ -112,11 +101,18 @@ void leMsg(int * conexao, estrutura *dados)
 void enviaMsgClient(estrutura * dados, int * conexao)
 {
     
-    write(*conexao, &dados->crypto, MAX_MSG);
+    if (write(*conexao, &dados->crypto, MAX_MSG)< 0){
+        printf("Erro ao enviar");
+        exit(1);
+    }
+    else {
+        printf("Enviado com sucesso\n");
+    }
+
 
 }
 
-int main(void)
+int main(int argc, char *argv[ ])
 {
     setlocale(LC_ALL,"Portuguese"); 
     
@@ -125,60 +121,86 @@ int main(void)
     
     FILE *pont_arq;    
     
+    
     int socket_desc, conexao,in_len;
     int out_len = MAX_MSG;
     
     uint8_t mensagem[MAX_MSG];
     estrutura dados;
     
-   	
+    
 
     
     
     socketServer(&socket_desc,&conexao); // cria e inicializa o socket, atribui endereços e escuta conexões  
-    
-    leMsg(&conexao,&dados); // lê mensagens enviadas pelo cliente
-    
-    gettimeofday(&utime, NULL);
-	T2 = utime.tv_sec + ( utime.tv_usec / 1000000.0 );
-    
-    dec(&dados); // descriptografa mensagens recebidas e exibe o texto 
-    
-    gettimeofday(&utime, NULL);
+    int i = 0;
+    //while(i <= qtd_exp ){
 
-    T3 = utime.tv_sec + ( utime.tv_usec / 1000000.0 );
-   
+    
+    if(i == 0){
+        pont_arq = fopen("tempos_exec.csv", "a");
+        fprintf(pont_arq, "%s", ",");
+        fprintf(pont_arq, "%s", "Tempo decriptografia server em ms:,");
+        fprintf(pont_arq, "%s", "Tempo criptografia server em ms:,");
+        fclose(pont_arq);
+        i++;
 
+    }else {
+        leMsg(&conexao,&dados); // lê mensagens enviadas pelo cliente
+        
+        gettimeofday(&utime, NULL);
+        T2 = utime.tv_sec + ( utime.tv_usec / 1000000.0 );
+        
+        dec(&dados); // descriptografa mensagens recebidas e exibe o texto 
+        
+        gettimeofday(&utime, NULL);
+
+        T3 = utime.tv_sec + ( utime.tv_usec / 1000000.0 );
        
-    //printf("Insira uma resposta para enviar ao cliente:\n\n");
-	//fgets(mensagem,MAX_MSG,stdin); 
-    
-    gettimeofday(&utime, NULL);
-	T4 = utime.tv_sec + ( utime.tv_usec / 1000000.0 );
-    
-    enc(&dados,dados.decryptedtext);     // criptografa mensagem 
-    
-    gettimeofday(&utime, NULL);
 
-    T5 = utime.tv_sec + ( utime.tv_usec / 1000000.0 );
-    
+           
+        //printf("Insira uma resposta para enviar ao cliente:\n\n");
+        //fgets(mensagem,MAX_MSG,stdin); 
+        
+        gettimeofday(&utime, NULL);
+        T4 = utime.tv_sec + ( utime.tv_usec / 1000000.0 );
+        
+        enc(&dados,dados.decryptedtext);     // criptografa mensagem 
+        
+        gettimeofday(&utime, NULL);
 
-    dados.DIFF_Server = T5 - T2 ;  
-    
-    enviaMsgClient(&dados,&conexao); // envia mensagem para o cliente 
+        T5 = utime.tv_sec + ( utime.tv_usec / 1000000.0 );
+        
 
+        dados.DIFF_Server = T5 - T2 ;  
+        
+        enviaMsgClient(&dados,&conexao); // envia mensagem para o cliente 
+
+            
+        
+        pont_arq = fopen("tempos_exec.csv", "a");
+
+        fprintf(pont_arq, "%d,", i);
+
+
+        //fprintf(pont_arq, "%s", "Tempo decriptografia server em ms:,");
+        fprintf(pont_arq, "%.10lf,", T3 - T2);
+        
+
+        //fprintf(pont_arq, "%s", "Tempo criptografia server em ms:,");
+        fprintf(pont_arq, "%.10lf,", T5- T4);
+        fclose(pont_arq);
+        memcpy (dados.decryptedtext, " ", 1 );
+        memcpy (dados.crypto, " ", 1 );
+        i++;
+
+
+
+    }
+    
         
     
-    pont_arq = fopen("tempos_exec.csv", "a");
-
-
-    //fprintf(pont_arq, "%s", "Tempo decriptografia server em ms:,");
-    fprintf(pont_arq, "%.10lf,", T3 - T2);
-    
-
-    //fprintf(pont_arq, "%s", "Tempo criptografia server em ms:,");
-    fprintf(pont_arq, "%.10lf,", T5- T4);
-    fclose(pont_arq);
+    //}
     
 
     close(socket_desc);
