@@ -132,20 +132,23 @@ int main(int argc, char *argv[ ])
 
     
     
-    socketServer(&socket_desc,&conexao); // cria e inicializa o socket, atribui endereços e escuta conexões  
-    int i = 0;
-    //while(i <= qtd_exp ){
+    
+    
 
     
-    if(i == 0){
+    if(strcmp(argv[1],"0") == 0){
         pont_arq = fopen("tempos_exec.csv", "a");
         fprintf(pont_arq, "%s", ",");
         fprintf(pont_arq, "%s", "Tempo decriptografia server em ms:,");
         fprintf(pont_arq, "%s", "Tempo criptografia server em ms:,");
         fclose(pont_arq);
-        i++;
+
+      
 
     }else {
+        
+        socketServer(&socket_desc,&conexao); // cria e inicializa o socket, atribui endereços e escuta conexões  
+    
         leMsg(&conexao,&dados); // lê mensagens enviadas pelo cliente
         
         gettimeofday(&utime, NULL);
@@ -176,31 +179,20 @@ int main(int argc, char *argv[ ])
         
         enviaMsgClient(&dados,&conexao); // envia mensagem para o cliente 
 
-            
-        
+
         pont_arq = fopen("tempos_exec.csv", "a");
 
-        fprintf(pont_arq, "%d,", i);
+        fprintf(pont_arq, "%s,", argv[1]);
 
-
-        //fprintf(pont_arq, "%s", "Tempo decriptografia server em ms:,");
         fprintf(pont_arq, "%.10lf,", T3 - T2);
-        
-
-        //fprintf(pont_arq, "%s", "Tempo criptografia server em ms:,");
+  
         fprintf(pont_arq, "%.10lf,", T5- T4);
         fclose(pont_arq);
-        memcpy (dados.decryptedtext, " ", 1 );
-        memcpy (dados.crypto, " ", 1 );
-        i++;
-
+       
 
 
     }
     
-        
-    
-    //}
     
 
     close(socket_desc);

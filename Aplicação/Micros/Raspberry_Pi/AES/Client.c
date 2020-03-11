@@ -13,10 +13,10 @@
 
 	
 
- void socketClient (int * socket_desc)
+ void socketClient (int * socket_desc, char *ip )
  {
 	 
-	 uint8_t ip[15];
+	 //uint8_t ip[15];
 	 
 	 struct sockaddr_in servidor;
 	 /* Criando um socket */
@@ -30,8 +30,9 @@
 	// familia ARPANET
 	// Porta - hton = host to network short (2bytes)
 	
-	printf("\nInsira o IP do nó servidor:\n");
-	fgets(ip,15,stdin);
+	//printf("\nInsira o IP do nó servidor:\n");
+	//fgets(ip,15,stdin);
+	
 	fflush(stdin);
 	servidor.sin_addr.s_addr = inet_addr(ip);
 	servidor.sin_family = AF_INET;
@@ -101,49 +102,48 @@ int main(int argc, char *argv[ ])
 	// variaveis
 	int socket_desc;	
 	estrutura dados; 
-	FILE *pont_arq;
+	FILE *pont_arq, *fp3;
+
+	printf("%s\n",argv[4]);
+
+	char ip [15];
+
+	strcpy(ip, argv[4]);
+
+	printf("%s",argv[3]);
+	
 
 	
-	
-
-	socketClient(&socket_desc); // cria socket e conecta ao servidor	
-
-	int i = 0 ;
 
 
 
+	if(strcmp(argv[1],"0") == 0)
+	{
 
+		
 
+        pont_arq = fopen("tempos_exec.csv", "a");
+        fprintf(pont_arq, "%s","Tempo criptografia cliente:,");
+        fprintf(pont_arq, "%s", "Tempo decriptografia cliente em ms:,");
+        fprintf(pont_arq, "%s", "Tempo de envio entre os nós em ms:\n");
+        fclose(pont_arq);
+       
 
-	
-//	while(i <= qtd_exp ){
-
-
-		if (i == 0 )
+	}else
+	{
+		socketClient(&socket_desc, ip); // cria socket e conecta ao servidor	
+		if (strcmp(argv[2],"-f") == 0)
 		{
-
-			if (strcmp(argv[1],"-f") == 0)
-			{
-				FILE * fp;
-				fp = fopen ("teste2.jpg","rb");
-				fread(&dados.decryptedtext,sizeof(uint8_t),MAX_MSG,fp);
-				fclose(fp);
-			}else
-			{
-				printf("Insira uma mensagem para enviar ao servidor:\n\n");
-				fgets(dados.decryptedtext,MAX_MSG,stdin);
-			}
-
-			pont_arq = fopen("tempos_exec.csv", "a");
-			fprintf(pont_arq, "%s","Tempo criptografia cliente:,");
-			fprintf(pont_arq, "%s", "Tempo decriptografia cliente em ms:,");
-			fprintf(pont_arq, "%s", "Tempo de envio entre os nós em ms:\n");
-			fclose(pont_arq);
-			
-
-		}//else {
+			FILE * fp;
+			fp = fopen (argv[3],"rb");
+			fread(&dados.decryptedtext,sizeof(uint8_t),MAX_MSG,fp);
+			fclose(fp);
+		}else
+		{
 			//printf("Insira uma mensagem para enviar ao servidor:\n\n");
 			//fgets(dados.decryptedtext,MAX_MSG,stdin);
+			strcpy(dados.decryptedtext,argv[3]);
+		}		
 
 			gettimeofday(&utime, NULL);
 
@@ -173,11 +173,7 @@ int main(int argc, char *argv[ ])
 		    T7 = utime.tv_sec + ( utime.tv_usec / 1000000.0 );
 
 		    pont_arq = fopen("tempos_exec.csv", "a");
-		    
 
-		    
-
-		    
 		    fprintf(pont_arq, "%.10lf,", T1 - T0);
 		        
 			
@@ -187,17 +183,22 @@ int main(int argc, char *argv[ ])
 		    
 		    fprintf(pont_arq, "%.10lf\n", (T6-T1-(dados.DIFF_Server)/2));
 		    fclose(pont_arq);
-		    i++;
 
-		//}
-		
-		
-		
-	   
+		    if (strcmp(argv[2],"-f") == 0){
 
-	//}
+		    	fp3 = fopen("confirmacao.jpg","wb+"); 
 
-	
+  				fwrite (&dados.decryptedtext,1,MAX_MSG,fp3);
+
+  				fclose(fp3);
+		    }
+		    
+		    
+
+
+
+	}
+
 	fechaSocket(&socket_desc); // encerra a comunicação	
 
 	

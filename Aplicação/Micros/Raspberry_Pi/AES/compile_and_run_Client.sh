@@ -4,4 +4,10 @@ gcc crypto_rasp.c Client.c \
     -L/home/augusto/relic/relic-target/lib \
     -lrelic_s \
     -o client 
-./client -f /home/augusto/Documentos/criptografia/Aplicação/Micros/Raspberry Pi/AES
+
+ for i in {0..10}
+do
+	./client $i -k "oi teste" 127.0.0.1 
+	sleep 3s
+done   
+

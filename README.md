@@ -38,13 +38,40 @@ O script deve ser alterado de acordo com os paths da Relic já compilada.
 O script modelo tem a seguinte forma: 
 
 
-gcc teste.c \
-    -I/home/pi/Documents/relic/relic-target/include \ 
-    -I/home/pi/Documents/relic/include \
-    -L//home/pi/Documents/relic/relic-target/lib \
+gcc crypto_rasp.c Client.c \
+    -I/home/augusto/relic/relic-target/include \
+    -I/home/augusto/relic/include \
+    -L/home/augusto/relic/relic-target/lib \
     -lrelic_s \
-    -o teste
-./teste
+    -o client 
+
+ for i in {0..10}
+do
+	./client $i -k "oi teste" 127.0.0.1 
+	sleep 3s
+done
+
+
+
+## Realizando testes com diferentes tipos de mensages ## 
+
+Ao realizar testes criptografando uma imagem, inserir no script do cliente (compile_and_run_Client.sh) o parâmetro -f seguido do path da imagem que deseja realizar as operações. O ip do nó servidor é passado como último parâmetro.
+
+Para testes com Strings, foi utilizado o parametro -k seguido da string entre aspas duplas. O ip do nó servidor é passado como último parâmetro.
+
+
+
+O numero de repetições que o experimento será realizado também é definido no script e deve ser alterado com os mesmos valores, tanto no cliente, quanto no servidor. 
+
+Ao terminar os experimentos um arquivo .csv será criado com os tempos de execução de cada operação. 
+
+
+
+
+
+
+
+
 
 
 
