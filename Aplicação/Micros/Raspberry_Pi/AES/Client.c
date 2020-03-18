@@ -134,7 +134,7 @@ int main(int argc, char *argv[ ])
 		
 
         pont_arq = fopen("tempos_exec_Client.csv", "a");
-        fprintf(pont_arq, "%s", "\n\n\nPC-PC, CHAVE 256 bits, Imagem\n");
+        fprintf(pont_arq, "%s", "\n\n\nPlaca-Placa, CHAVE 256 bits, Imagem\n");
         fprintf(pont_arq, "%s", "No Exp.,");
         fprintf(pont_arq, "%s","Tempo criptografia cliente:,");
         fprintf(pont_arq, "%s", "Tempo decriptografia cliente em ms:,");
