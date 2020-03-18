@@ -47,7 +47,7 @@ gcc crypto_rasp.c Client.c \
 
  for i in {0..10}
 do
-	./client $i -k "oi teste" 127.0.0.1 
+	./client $i "oi teste" 127.0.0.1 
 	sleep 3s
 done
 
@@ -57,7 +57,7 @@ done
 
 Ao realizar testes criptografando uma imagem, inserir no script do cliente (compile_and_run_Client.sh) o parâmetro -f seguido do path da imagem que deseja realizar as operações. O ip do nó servidor é passado como último parâmetro.
 
-Para testes com Strings, foi utilizado o parametro -k seguido da string entre aspas duplas. O ip do nó servidor é passado como último parâmetro.
+Para testes com Strings, é passado o valor da string entre aspas duplas após o $i. O ip do nó servidor é passado como último parâmetro.
 
 
 
