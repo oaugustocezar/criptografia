@@ -45,7 +45,7 @@
 		exit(1);
 		
 	}
-	printf("Conectado no servidor\n");
+	printf("\nConectado no servidor\n");
 	
 }	
 	 
@@ -87,7 +87,7 @@ void recebeMsg(int * socket_desc, estrutura *dados)
 
 	close(*socket_desc); // fechando o socket
 
-	printf("Cliente finalizado com sucesso!\n");
+	printf("\nCliente finalizado com sucesso!\n");
 }
 
 
@@ -104,13 +104,24 @@ int main(int argc, char *argv[ ])
 	estrutura dados; 
 	FILE *pont_arq, *fp3;
 
-	printf("%s\n",argv[4]);
+	
 
 	char ip [15];
 
-	strcpy(ip, argv[4]);
+	if (strcmp(argv[2],"-f") == 0){
+		strcpy(ip, argv[4]);
 
-	printf("%s",argv[3]);
+	}else{
+		strcpy(ip, argv[3]);
+
+	}
+
+	//printf("path %s", argv[3]);
+	//printf("path %s", argv[3]);
+
+	
+
+	
 	
 
 	
@@ -122,7 +133,9 @@ int main(int argc, char *argv[ ])
 
 		
 
-        pont_arq = fopen("tempos_exec.csv", "a");
+        pont_arq = fopen("tempos_exec_Client.csv", "a");
+        fprintf(pont_arq, "%s", "\n\n\nPC-PC, CHAVE 256 bits, Imagem\n");
+        fprintf(pont_arq, "%s", "No Exp.,");
         fprintf(pont_arq, "%s","Tempo criptografia cliente:,");
         fprintf(pont_arq, "%s", "Tempo decriptografia cliente em ms:,");
         fprintf(pont_arq, "%s", "Tempo de envio entre os nós em ms:\n");
@@ -142,7 +155,7 @@ int main(int argc, char *argv[ ])
 		{
 			//printf("Insira uma mensagem para enviar ao servidor:\n\n");
 			//fgets(dados.decryptedtext,MAX_MSG,stdin);
-			strcpy(dados.decryptedtext,argv[3]);
+			strcpy(dados.decryptedtext,argv[2]);
 		}		
 
 			gettimeofday(&utime, NULL);
@@ -172,7 +185,8 @@ int main(int argc, char *argv[ ])
 
 		    T7 = utime.tv_sec + ( utime.tv_usec / 1000000.0 );
 
-		    pont_arq = fopen("tempos_exec.csv", "a");
+		    pont_arq = fopen("tempos_exec_Client.csv", "a");
+		    fprintf(pont_arq, "%s,", argv[1]);
 
 		    fprintf(pont_arq, "%.10lf,", T1 - T0);
 		        

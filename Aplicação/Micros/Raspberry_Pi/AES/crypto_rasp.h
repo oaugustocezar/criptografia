@@ -2,7 +2,7 @@
 #define CRYPTO_RASP
 
 #define MAX_MSG 102400
-#define DEBUG 1
+#define DEBUG 0
 
 #include <sys/time.h> 
 #include <sys/socket.h>

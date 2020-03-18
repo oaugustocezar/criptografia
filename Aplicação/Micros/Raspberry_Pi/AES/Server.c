@@ -53,14 +53,18 @@ void socketServer (int * socket_desc, int *conexao)
         perror("Erro ao fazer bind\n");
         
     }
-    puts("Bind efetuado com sucesso\n");
+    puts("\nBind efetuado com sucesso\n");
 
     // Ouvindo por conexoes
     listen(*socket_desc, 3);
     /*********************************************************/
 
     //Aceitando e tratando conexoes
-    puts("Aguardando por conexoes...");
+    if(DEBUG){
+        puts("Aguardando por conexoes...");
+
+    }
+    
     c = sizeof(struct sockaddr_in);
     *conexao = accept(*socket_desc, (struct sockaddr *)&cliente, (socklen_t *)&c);
     if (conexao < 0)
@@ -75,7 +79,11 @@ void socketServer (int * socket_desc, int *conexao)
     // pegando IP e porta do cliente
     cliente_ip = inet_ntoa(cliente.sin_addr);
     cliente_port = ntohs(cliente.sin_port);
-    printf("cliente conectou\nIP:PORTA -> %s:%d\n", cliente_ip, cliente_port);
+    if(DEBUG){
+         printf("cliente conectou\nIP:PORTA -> %s:%d\n", cliente_ip, cliente_port);
+
+    }
+   
         
 }
 
@@ -106,7 +114,11 @@ void enviaMsgClient(estrutura * dados, int * conexao)
         exit(1);
     }
     else {
-        printf("Enviado com sucesso\n");
+        if(DEBUG){
+            printf("Enviado com sucesso\n");
+
+        }
+        
     }
 
 
@@ -137,10 +149,11 @@ int main(int argc, char *argv[ ])
 
     
     if(strcmp(argv[1],"0") == 0){
-        pont_arq = fopen("tempos_exec.csv", "a");
-        fprintf(pont_arq, "%s", ",");
+        pont_arq = fopen("tempos_exec_Server.csv", "a");
+        fprintf(pont_arq, "%s", "\n\n\nPC-PC, CHAVE 256 bits, Imagem\n");
+        fprintf(pont_arq, "%s", "No Exp.,");
         fprintf(pont_arq, "%s", "Tempo decriptografia server em ms:,");
-        fprintf(pont_arq, "%s", "Tempo criptografia server em ms:,");
+        fprintf(pont_arq, "%s", "Tempo criptografia server em ms:\n");
         fclose(pont_arq);
 
       
@@ -180,13 +193,13 @@ int main(int argc, char *argv[ ])
         enviaMsgClient(&dados,&conexao); // envia mensagem para o cliente 
 
 
-        pont_arq = fopen("tempos_exec.csv", "a");
+        pont_arq = fopen("tempos_exec_Server.csv", "a");
 
         fprintf(pont_arq, "%s,", argv[1]);
 
         fprintf(pont_arq, "%.10lf,", T3 - T2);
   
-        fprintf(pont_arq, "%.10lf,", T5- T4);
+        fprintf(pont_arq, "%.10lf\n", T5- T4);
         fclose(pont_arq);
        
 

@@ -5,7 +5,7 @@ gcc crypto_rasp.c Server.c \
     -lrelic_s \
     -o server
 
- for i in {0..10}
+ for i in {0..20}
 do
  	./server $i
  	sleep 1s
