@@ -1,8 +1,10 @@
 #ifndef CRYPTO_RASP
 #define CRYPTO_RASP
 
-#define MAX_MSG 102400
+#define MAX_MSG 2000000
+
 #define DEBUG 0
+#define KEY_LEN 32
 
 #include <sys/time.h> 
 #include <sys/socket.h>

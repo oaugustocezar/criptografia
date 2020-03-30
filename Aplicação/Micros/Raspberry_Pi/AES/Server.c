@@ -131,7 +131,7 @@ int main(int argc, char *argv[ ])
     
     //variaveis
     
-    FILE *pont_arq;    
+    FILE *pont_arq,*fp3;    
     
     
     int socket_desc, conexao,in_len;
@@ -140,70 +140,59 @@ int main(int argc, char *argv[ ])
     uint8_t mensagem[MAX_MSG];
     estrutura dados;
     
-    
 
-    
-    
-    
-    
 
     
     if(strcmp(argv[1],"0") == 0){
         pont_arq = fopen("tempos_exec_Server.csv", "a");
-        fprintf(pont_arq, "%s", "\n\n\nPC-PC, CHAVE 256 bits, Imagem\n");
+        fprintf(pont_arq, "%s", "\n\n\nPC-PC,");
+        if(KEY_LEN == 16){
+            fprintf(pont_arq, "%s", "CHAVE 128 bits,");
+        }else if(KEY_LEN == 24){
+            fprintf(pont_arq, "%s", "CHAVE 192 bits,");
+        }else if(KEY_LEN == 32){
+            fprintf(pont_arq, "%s", "CHAVE 256 bits,");
+        }
+        if (strcmp(argv[2],"-f") == 0){
+            fprintf(pont_arq, "%s", "Imagem\n");
+        }else{
+            fprintf(pont_arq, "%s", "String\n");
+        }
         fprintf(pont_arq, "%s", "No Exp.,");
         fprintf(pont_arq, "%s", "Tempo decriptografia server em ms:,");
         fprintf(pont_arq, "%s", "Tempo criptografia server em ms:\n");
-        fclose(pont_arq);
-
-      
+        fclose(pont_arq);      
 
     }else {
         
-        socketServer(&socket_desc,&conexao); // cria e inicializa o socket, atribui endereços e escuta conexões  
-    
-        leMsg(&conexao,&dados); // lê mensagens enviadas pelo cliente
-        
+        socketServer(&socket_desc,&conexao); // cria e inicializa o socket, atribui endereços e escuta conexões      
+        leMsg(&conexao,&dados); // lê mensagens enviadas pelo cliente        
         gettimeofday(&utime, NULL);
-        T2 = utime.tv_sec + ( utime.tv_usec / 1000000.0 );
-        
-        dec(&dados); // descriptografa mensagens recebidas e exibe o texto 
-        
+        T2 = utime.tv_sec + ( utime.tv_usec / 1000000.0 );        
+        dec(&dados); // descriptografa mensagens recebidas e exibe o texto         
         gettimeofday(&utime, NULL);
-
-        T3 = utime.tv_sec + ( utime.tv_usec / 1000000.0 );
-       
-
-           
+        T3 = utime.tv_sec + ( utime.tv_usec / 1000000.0 );  
         //printf("Insira uma resposta para enviar ao cliente:\n\n");
-        //fgets(mensagem,MAX_MSG,stdin); 
-        
+        //fgets(mensagem,MAX_MSG,stdin);         
         gettimeofday(&utime, NULL);
-        T4 = utime.tv_sec + ( utime.tv_usec / 1000000.0 );
-        
-        enc(&dados,dados.decryptedtext);     // criptografa mensagem 
-        
+        T4 = utime.tv_sec + ( utime.tv_usec / 1000000.0 );   
+        enc(&dados,dados.decryptedtext);     // criptografa mensagem         
         gettimeofday(&utime, NULL);
-
         T5 = utime.tv_sec + ( utime.tv_usec / 1000000.0 );
-        
-
-        dados.DIFF_Server = T5 - T2 ;  
-        
+        dados.DIFF_Server = T5 - T2 ;        
         enviaMsgClient(&dados,&conexao); // envia mensagem para o cliente 
-
-
         pont_arq = fopen("tempos_exec_Server.csv", "a");
-
         fprintf(pont_arq, "%s,", argv[1]);
-
-        fprintf(pont_arq, "%.10lf,", T3 - T2);
-  
+        fprintf(pont_arq, "%.10lf,", T3 - T2);  
         fprintf(pont_arq, "%.10lf\n", T5- T4);
         fclose(pont_arq);
-       
 
+         /*if (strcmp(argv[2],"-f") == 0){
 
+                fp3 = fopen(argv[3],"wb+"); 
+                fwrite (&dados.decryptedtext,1,MAX_MSG,fp3);
+                fclose(fp3);
+            }*/
     }
     
     

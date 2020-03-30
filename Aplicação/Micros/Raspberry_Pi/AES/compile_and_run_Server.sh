@@ -5,8 +5,15 @@ gcc crypto_rasp.c Server.c \
     -lrelic_s \
     -o server
 
- for i in {0..20}
+ for i in {0..40}
 do
- 	./server $i
+ 	./server $i  /home/augusto/Documentos/criptografia/Aplicação/Micros/Raspberry_Pi/AES/Imagens/Confirmação_Server/img$i.jpg
  	sleep 1s
-done   
+done
+
+
+ for i in {0..40}
+do
+ 	./server $i -f /home/augusto/Documentos/criptografia/Aplicação/Micros/Raspberry_Pi/AES/Imagens/Confirmação_Server/img$i.jpg
+ 	sleep 1s
+done
