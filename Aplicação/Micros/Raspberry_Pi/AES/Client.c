@@ -109,7 +109,7 @@ int main(int argc, char *argv[ ])
 	char ip [15];
 
 	if (strcmp(argv[2],"-f") == 0){
-		strcpy(ip, argv[5]);
+		strcpy(ip, argv[4]);
 
 	}else{
 		strcpy(ip, argv[3]);
@@ -129,27 +129,16 @@ int main(int argc, char *argv[ ])
 
 
 	if(strcmp(argv[1],"0") == 0)
-	{	
+	{
+
+		
 
         pont_arq = fopen("tempos_exec_Client.csv", "a");
-        fprintf(pont_arq, "%s", "\n\n\nPC-PC,");
-        if(KEY_LEN == 16){
-        	fprintf(pont_arq, "%s", "CHAVE 128 bits,");
-        }else if(KEY_LEN == 24){
-        	fprintf(pont_arq, "%s", "CHAVE 192 bits,");
-        }else if(KEY_LEN == 32){
-        	fprintf(pont_arq, "%s", "CHAVE 256 bits,");
-        }
-        if (strcmp(argv[2],"-f") == 0){
-        	fprintf(pont_arq, "%s", "Imagem\n");
-        }else{
-        	fprintf(pont_arq, "%s", "String\n");
-        }
-        
+        fprintf(pont_arq, "%s", "\n\n\nPC-PC, CHAVE 256 bits, Imagem\n");
         fprintf(pont_arq, "%s", "No Exp.,");
         fprintf(pont_arq, "%s","Tempo criptografia cliente:,");
         fprintf(pont_arq, "%s", "Tempo decriptografia cliente em ms:,");
-        fprintf(pont_arq, "%s", "Tempo de envio entre os nos em ms:\n");
+        fprintf(pont_arq, "%s", "Tempo de envio entre os nós em ms:\n");
         fclose(pont_arq);
        
 
@@ -164,33 +153,57 @@ int main(int argc, char *argv[ ])
 			fclose(fp);
 		}else
 		{
+			//printf("Insira uma mensagem para enviar ao servidor:\n\n");
+			//fgets(dados.decryptedtext,MAX_MSG,stdin);
 			strcpy(dados.decryptedtext,argv[2]);
 		}		
 
 			gettimeofday(&utime, NULL);
-			T0 = utime.tv_sec + ( utime.tv_usec / 1000000.0 );			
-			enc(&dados,dados.decryptedtext); // criptografa mensagem 			
+
+			T0 = utime.tv_sec + ( utime.tv_usec / 1000000.0 );
+			
+			enc(&dados,dados.decryptedtext); // criptografa mensagem 
+			
 			gettimeofday(&utime, NULL);
+
 		    T1 = utime.tv_sec + ( utime.tv_usec / 1000000.0 );
-		    strcpy(dados.decryptedtext," ");
+		    
+			
 			enviaMsgServer(&socket_desc,&dados); // envia mensagem para o servidor
-			recebeMsg(&socket_desc,&dados); //Recebendo resposta do servidor		
+				
+			
+			recebeMsg(&socket_desc,&dados); //Recebendo resposta do servidor
+			
+			
+			gettimeofday(&utime, NULL); 
+			T6 = utime.tv_sec + ( utime.tv_usec / 1000000.0 ); 
+			
+			
+			dec(&dados); // decriptografa mensagem 
+			
 			gettimeofday(&utime, NULL);
-			T6 = utime.tv_sec + ( utime.tv_usec / 1000000.0 ); 		
-			dec(&dados); // decriptografa mensagem 			
-			gettimeofday(&utime, NULL);
+
 		    T7 = utime.tv_sec + ( utime.tv_usec / 1000000.0 );
+
 		    pont_arq = fopen("tempos_exec_Client.csv", "a");
 		    fprintf(pont_arq, "%s,", argv[1]);
-		    fprintf(pont_arq, "%.10lf,", T1 - T0);        
-			fprintf(pont_arq, "%.10lf,", T7 - T6);	        
+
+		    fprintf(pont_arq, "%.10lf,", T1 - T0);
+		        
+			
+		    
+		    fprintf(pont_arq, "%.10lf,", T7 - T6);
+		        
+		    
 		    fprintf(pont_arq, "%.10lf\n", (T6-T1-(dados.DIFF_Server)/2));
 		    fclose(pont_arq);
 
 		    if (strcmp(argv[2],"-f") == 0){
 
-		    	fp3 = fopen(argv[4],"wb+"); 
+		    	fp3 = fopen("confirmacao.jpg","wb+"); 
+
   				fwrite (&dados.decryptedtext,1,MAX_MSG,fp3);
+
   				fclose(fp3);
 		    }
 		    
