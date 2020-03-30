@@ -6,13 +6,13 @@ gcc crypto_rasp.c Client.c \
     -o client 
 
 
-: '	for i in {0..20}
+	for i in {0..40}
 do
 	./client $i "criptografando mensagens para realizar testes de tempo de criptografia e decriptografia em um sistema de comunicação cliente-servidor" 127.0.0.1 
 	sleep 3s
-done'
+done
 
-	for i in {0..20}
+	for i in {0..40}
 do
 	./client $i -f /home/augusto/Documentos/criptografia/Aplicação/Micros/Raspberry_Pi/AES/Imagens/pao_na_chapa.jpg 127.0.0.1 
 	sleep 3s

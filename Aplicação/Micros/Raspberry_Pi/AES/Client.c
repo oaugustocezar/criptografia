@@ -134,11 +134,24 @@ int main(int argc, char *argv[ ])
 		
 
         pont_arq = fopen("tempos_exec_Client.csv", "a");
-        fprintf(pont_arq, "%s", "\n\n\nPC-PC, CHAVE 256 bits, Imagem\n");
+        fprintf(pont_arq, "%s", "\n\n\nPC-PC,");
+        if(KEY_LEN == 16){
+        	fprintf(pont_arq, "%s", "CHAVE 128 bits,");
+        }else if(KEY_LEN == 24){
+        	fprintf(pont_arq, "%s", "CHAVE 192 bits,");
+        }else if(KEY_LEN == 32){
+        	fprintf(pont_arq, "%s", "CHAVE 256 bits,");
+        }
+        if (strcmp(argv[2],"-f") == 0){
+        	fprintf(pont_arq, "%s", "Imagem\n");
+        }else{
+        	fprintf(pont_arq, "%s", "String\n");
+        }
+
         fprintf(pont_arq, "%s", "No Exp.,");
         fprintf(pont_arq, "%s","Tempo criptografia cliente:,");
         fprintf(pont_arq, "%s", "Tempo decriptografia cliente em ms:,");
-        fprintf(pont_arq, "%s", "Tempo de envio entre os nós em ms:\n");
+        fprintf(pont_arq, "%s", "Tempo de envio entre os nos em ms:\n");
         fclose(pont_arq);
        
 
