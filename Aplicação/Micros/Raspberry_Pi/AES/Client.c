@@ -122,7 +122,12 @@ int main(int argc, char *argv[ ])
 	
 
 	
-	
+	if(atoi(argv[1]) == 0){
+
+		
+	}else{
+		printf(MAG"\nExp no %s iniciado\n"RESET,argv[1]);
+	}
 
 	
 
@@ -134,7 +139,12 @@ int main(int argc, char *argv[ ])
 		
 
         pont_arq = fopen("tempos_exec_Client.csv", "a");
-        fprintf(pont_arq, "%s", "\n\n\nPC-PC,");
+        if(EXP == 0)
+        	fprintf(pont_arq, "%s", "\n\n\nPC-PC,");
+        if(EXP == 1)
+        	fprintf(pont_arq, "%s", "\n\n\nPC-Placa,");
+        if(EXP == 2)
+        	fprintf(pont_arq, "%s", "\n\n\nPlaca-Placa,");
         if(KEY_LEN == 16){
         	fprintf(pont_arq, "%s", "CHAVE 128 bits,");
         }else if(KEY_LEN == 24){
@@ -168,6 +178,8 @@ int main(int argc, char *argv[ ])
 		{
 			//printf("Insira uma mensagem para enviar ao servidor:\n\n");
 			//fgets(dados.decryptedtext,MAX_MSG,stdin);
+			printf("%ld",strlen(argv[2]));
+
 			strcpy(dados.decryptedtext,argv[2]);
 		}		
 
@@ -226,7 +238,17 @@ int main(int argc, char *argv[ ])
 
 	}
 
+
+
 	fechaSocket(&socket_desc); // encerra a comunicação	
+	if(atoi(argv[1]) == 0){
+
+		
+	}else{
+		printf(GRN"\nExp nº %s realizado com sucesso!\n"RESET,argv[1]);
+	}
+
+	
 
 	
 	return 0;

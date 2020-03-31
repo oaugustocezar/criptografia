@@ -139,6 +139,13 @@ int main(int argc, char *argv[ ])
     
     uint8_t mensagem[MAX_MSG];
     estrutura dados;
+
+   if(atoi(argv[1]) == 0){
+
+        
+    }else{
+        printf(MAG"\nExp no %s iniciado\n"RESET,argv[1]);
+    }
     
     
 
@@ -150,7 +157,12 @@ int main(int argc, char *argv[ ])
     
     if(strcmp(argv[1],"0") == 0){
         pont_arq = fopen("tempos_exec_Server.csv", "a");
-        fprintf(pont_arq, "%s", "\n\n\nPC-PC,");
+        if(EXP == 0)
+            fprintf(pont_arq, "%s", "\n\n\nPC-PC,");
+        if(EXP == 1)
+            fprintf(pont_arq, "%s", "\n\n\nPC-Placa,");
+        if(EXP == 2)
+            fprintf(pont_arq, "%s", "\n\n\nPlaca-Placa,");
         if(KEY_LEN == 16){
             fprintf(pont_arq, "%s", "CHAVE 128 bits,");
         }else if(KEY_LEN == 24){
@@ -222,7 +234,15 @@ int main(int argc, char *argv[ ])
 
     close(socket_desc);
     shutdown(socket_desc, 2);
+    
+    if(atoi(argv[1]) == 0){
 
-    printf("Servidor finalizado...\n");
+        
+    }else{
+        printf(GRN"\nExp nº %s realizado com sucesso!\n"RESET,argv[1]);
+    }
+
+    if(DEBUG)
+        printf("Servidor finalizado...\n");
     return 0;
 }
