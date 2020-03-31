@@ -53,7 +53,8 @@ void socketServer (int * socket_desc, int *conexao)
         perror("Erro ao fazer bind\n");
         
     }
-    puts("\nBind efetuado com sucesso\n");
+    if(DEBUG)
+        puts("\nBind efetuado com sucesso\n");
 
     // Ouvindo por conexoes
     listen(*socket_desc, 3);
@@ -134,7 +135,7 @@ int main(int argc, char *argv[ ])
     FILE *pont_arq;    
     
     
-    int socket_desc, conexao,in_len;
+    int socket_desc, conexao,in_len,tamanho;
     int out_len = MAX_MSG;
     
     uint8_t mensagem[MAX_MSG];
@@ -142,6 +143,12 @@ int main(int argc, char *argv[ ])
     
     
 
+    if(atoi(argv[1]) == 0){
+
+        
+    }else{
+        printf(MAG"\nExp no %s iniciado\n"RESET,argv[1]);
+    }
     
     
     
@@ -164,8 +171,8 @@ int main(int argc, char *argv[ ])
             fprintf(pont_arq, "%s", "String\n");
         }
         fprintf(pont_arq, "%s", "No Exp.,");
-        fprintf(pont_arq, "%s", "Tempo decriptografia server em ms:,");
-        fprintf(pont_arq, "%s", "Tempo criptografia server em ms:\n");
+        fprintf(pont_arq, "%s", "Tempo decriptografia server em s:,");
+        fprintf(pont_arq, "%s", "Tempo criptografia server em s:\n");
         fclose(pont_arq);
 
       
@@ -184,6 +191,10 @@ int main(int argc, char *argv[ ])
         gettimeofday(&utime, NULL);
 
         T3 = utime.tv_sec + ( utime.tv_usec / 1000000.0 );
+
+        tamanho = strlen(dados.decryptedtext);
+
+
        
 
            
@@ -222,7 +233,13 @@ int main(int argc, char *argv[ ])
 
     close(socket_desc);
     shutdown(socket_desc, 2);
+    if(DEBUG)
+        printf("Servidor finalizado...\n");
+    if(atoi(argv[1]) == 0){
 
-    printf("Servidor finalizado...\n");
+        
+    }else{
+        printf(GRN"\nExp no %s realizado com sucesso\n"RESET,argv[1]);
+    }
     return 0;
 }

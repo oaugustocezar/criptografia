@@ -1,6 +1,6 @@
 
 #include "crypto_rasp.h"
-
+#include <unistd.h> // for sleep
 
 
 /*
@@ -45,14 +45,15 @@
 		exit(1);
 		
 	}
-	printf("\nConectado no servidor\n");
+	if(DEBUG)
+		printf("\nConectado no servidor\n");
 	
 }	
 	 
  void enviaMsgServer (int * socket_desc, estrutura *dados)
 {
 	 
-	if (send(*socket_desc, dados, MAX_MSG, 0) < 0)  // envia o texto cifrado para  server
+	if (send(*socket_desc, dados, sizeof(dados->crypto), 0) < 0)  // envia o texto cifrado para  server
 	{
 		printf("Erro ao enviar mensagem\n");
 		exit(1);
@@ -87,7 +88,8 @@ void recebeMsg(int * socket_desc, estrutura *dados)
 
 	close(*socket_desc); // fechando o socket
 
-	printf("\nCliente finalizado com sucesso!\n");
+	if(DEBUG)
+		printf("\nCliente finalizado com sucesso!\n");
 }
 
 
@@ -103,6 +105,7 @@ int main(int argc, char *argv[ ])
 	int socket_desc;	
 	estrutura dados; 
 	FILE *pont_arq, *fp3;
+	
 
 	
 
@@ -119,9 +122,15 @@ int main(int argc, char *argv[ ])
 	//printf("path %s", argv[3]);
 	//printf("path %s", argv[3]);
 
-	
+	if(atoi(argv[1]) == 0){
 
+		
+	}else{
+		printf(MAG"\nExp no %s iniciado\n"RESET,argv[1]);
+	}
 	
+	
+		
 	
 
 	
@@ -134,7 +143,14 @@ int main(int argc, char *argv[ ])
 		
 
         pont_arq = fopen("tempos_exec_Client.csv", "a");
-        fprintf(pont_arq, "%s", "\n\n\nPC-PC,");
+        if(EXP == 0){
+        	fprintf(pont_arq, "%s", "\n\n\nPC-PC,");
+        }else if(EXP == 1){
+        	fprintf(pont_arq, "%s", "\n\n\nPC-Placa,");
+        }else if( EXP == 2){
+        	fprintf(pont_arq, "%s", "\n\n\nPlaca-Placa,");
+        }
+        
         if(KEY_LEN == 16){
         	fprintf(pont_arq, "%s", "CHAVE 128 bits,");
         }else if(KEY_LEN == 24){
@@ -150,8 +166,8 @@ int main(int argc, char *argv[ ])
 
         fprintf(pont_arq, "%s", "No Exp.,");
         fprintf(pont_arq, "%s","Tempo criptografia cliente:,");
-        fprintf(pont_arq, "%s", "Tempo decriptografia cliente em ms:,");
-        fprintf(pont_arq, "%s", "Tempo de envio entre os nos em ms:\n");
+        fprintf(pont_arq, "%s", "Tempo decriptografia cliente em s:,");
+        fprintf(pont_arq, "%s", "Tempo de envio entre os nos em s:\n");
         fclose(pont_arq);
        
 
@@ -161,19 +177,24 @@ int main(int argc, char *argv[ ])
 		if (strcmp(argv[2],"-f") == 0)
 		{
 			FILE * fp;
-			fp = fopen (argv[3],"rb");
+			fp = fopen (argv[3],"rb");			
 			fread(&dados.decryptedtext,sizeof(uint8_t),MAX_MSG,fp);
 			fclose(fp);
 		}else
 		{
 			//printf("Insira uma mensagem para enviar ao servidor:\n\n");
 			//fgets(dados.decryptedtext,MAX_MSG,stdin);
+			
+
 			strcpy(dados.decryptedtext,argv[2]);
+			dados.decryptedtext[strlen(argv[2])] = '\0';
+			
 		}		
 
 			gettimeofday(&utime, NULL);
 
 			T0 = utime.tv_sec + ( utime.tv_usec / 1000000.0 );
+
 			
 			enc(&dados,dados.decryptedtext); // criptografa mensagem 
 			
@@ -191,7 +212,7 @@ int main(int argc, char *argv[ ])
 			gettimeofday(&utime, NULL); 
 			T6 = utime.tv_sec + ( utime.tv_usec / 1000000.0 ); 
 			
-			
+			strcpy(dados.decryptedtext,"0");
 			dec(&dados); // decriptografa mensagem 
 			
 			gettimeofday(&utime, NULL);
@@ -210,6 +231,7 @@ int main(int argc, char *argv[ ])
 		    
 		    fprintf(pont_arq, "%.10lf\n", (T6-T1-(dados.DIFF_Server)/2));
 		    fclose(pont_arq);
+		    
 
 		    if (strcmp(argv[2],"-f") == 0){
 
@@ -227,6 +249,13 @@ int main(int argc, char *argv[ ])
 	}
 
 	fechaSocket(&socket_desc); // encerra a comunicação	
+
+	if(atoi(argv[1]) == 0){
+
+		
+	}else{
+		printf(GRN"\nExp no %s realizado com sucesso\n"RESET,argv[1]);
+	}
 
 	
 	return 0;

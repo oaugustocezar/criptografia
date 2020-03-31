@@ -26,8 +26,8 @@
  	}
 
 
-	int out_len = MAX_MSG;
-	int in_len;
+	int out_len;
+	int in_len = MAX_MSG;
 	 
 	in_len = strlen(mensagem);
 	 
