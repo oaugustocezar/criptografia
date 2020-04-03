@@ -35,7 +35,7 @@
 	 o texto criptografado é armazenado em dados->crypto e o tamanho da saida em out_len*/
 	{
 
-		printf("ERRO\n");
+		printf(RED"ERRO\n"RESET);
 		exit(1);
 
 	}
@@ -84,23 +84,27 @@ void dec (estrutura * dados)
 
    
     int out_len = MAX_MSG;
+    int in_len = dados->buffer;
     
-    if(bc_aes_cbc_dec(dados->decryptedtext,&out_len,dados->crypto,dados->buffer,key,KEY_LEN,iv)) /*  descriptografa, passando o texto cifrado
+    if(bc_aes_cbc_dec(dados->decryptedtext,&out_len,dados->crypto,in_len,key,KEY_LEN,iv)) /*  descriptografa, passando o texto cifrado
     em dados->buffer e o tamanho em dados->buffer, armazena o texto puro em decryptedtext e o seu tamanho em out_len */
     {	
     	if(DEBUG)
-			printf("ERRO\n");
+			printf(RED"ERRO\n"RESET);
 	
 
 	}
 	else
 	{
+		dados->buffer = out_len;
+		//printf("buffer %d",dados->buffer);
 		if(DEBUG)
 			printf("\n\nDescriptografado com sucesso\n\n");
+
 	}
 
-
-    dados->decryptedtext[out_len] = '\0'; // Coloca terminador de string
+	
+    
     if(DEBUG)
     	printf("O cliente falou: %s\n", dados->decryptedtext); 
         

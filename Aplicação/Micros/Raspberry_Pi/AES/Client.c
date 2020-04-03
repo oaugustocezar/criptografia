@@ -45,7 +45,8 @@
 		exit(1);
 		
 	}
-	printf("\nConectado no servidor\n");
+	if(DEBUG)
+		printf("\nConectado no servidor\n");
 	
 }	
 	 
@@ -54,7 +55,7 @@
 	 
 	if (send(*socket_desc, dados, MAX_MSG, 0) < 0)  // envia o texto cifrado para  server
 	{
-		printf("Erro ao enviar mensagem\n");
+		printf(RED"Erro ao enviar mensagem\n"RESET);
 		exit(1);
 	}
 	if(DEBUG)
@@ -86,8 +87,8 @@ void recebeMsg(int * socket_desc, estrutura *dados)
 {
 
 	close(*socket_desc); // fechando o socket
-
-	printf("\nCliente finalizado com sucesso!\n");
+	if(DEBUG)
+		printf("\nCliente finalizado com sucesso!\n");
 }
 
 
@@ -181,6 +182,7 @@ int main(int argc, char *argv[ ])
 			//printf("%ld",strlen(argv[2]));
 
 			strcpy(dados.decryptedtext,argv[2]);
+			dados.decryptedtext[strlen(dados.decryptedtext)] = '\0';
 		}		
 
 			gettimeofday(&utime, NULL);
@@ -205,6 +207,7 @@ int main(int argc, char *argv[ ])
 			
 			
 			dec(&dados); // decriptografa mensagem 
+			//printf("tamanho buffer %d",strlen(dados.decryptedtext));
 			
 			gettimeofday(&utime, NULL);
 
@@ -224,6 +227,7 @@ int main(int argc, char *argv[ ])
 		    fclose(pont_arq);
 
 		    if (strcmp(argv[2],"-f") == 0){
+		    	//printf("tamanho buffer %ld", sizeof(dados.decryptedtext));
 
 		    	fp3 = fopen("confirmacao.jpg","wb+"); 
 

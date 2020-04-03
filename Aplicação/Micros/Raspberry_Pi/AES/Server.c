@@ -53,7 +53,8 @@ void socketServer (int * socket_desc, int *conexao)
         perror("Erro ao fazer bind\n");
         
     }
-    puts("\nBind efetuado com sucesso\n");
+    if(DEBUG)
+        puts("\nBind efetuado com sucesso\n");
 
     // Ouvindo por conexoes
     listen(*socket_desc, 3);
@@ -95,8 +96,8 @@ void leMsg(int * conexao, estrutura *dados)
     
     if ((tamanho = read(*conexao, dados, MAX_MSG)) < 0)
     {
-        if(DEBUG)
-            perror("Erro ao receber dados do cliente: ");
+        
+            perror(RED"Erro ao receber dados do cliente: "RESET);
         
     }
     
@@ -110,7 +111,7 @@ void enviaMsgClient(estrutura * dados, int * conexao)
 {
     
     if (write(*conexao, &dados->crypto, strlen(dados->crypto))< 0){
-        printf("Erro ao enviar");
+        printf(RED"Erro ao enviar"RESET);
         exit(1);
     }
     else {
