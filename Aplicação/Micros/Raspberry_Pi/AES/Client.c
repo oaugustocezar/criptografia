@@ -178,7 +178,7 @@ int main(int argc, char *argv[ ])
 		{
 			//printf("Insira uma mensagem para enviar ao servidor:\n\n");
 			//fgets(dados.decryptedtext,MAX_MSG,stdin);
-			printf("%ld",strlen(argv[2]));
+			//printf("%ld",strlen(argv[2]));
 
 			strcpy(dados.decryptedtext,argv[2]);
 		}		

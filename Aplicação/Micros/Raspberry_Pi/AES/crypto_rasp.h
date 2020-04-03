@@ -2,7 +2,7 @@
 #define CRYPTO_RASP
 
 #define KEY_LEN 16
-#define EXP 0
+#define EXP 2
 
 #define MAX_MSG 2000000
 #define DEBUG 0

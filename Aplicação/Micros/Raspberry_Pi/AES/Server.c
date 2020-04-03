@@ -109,7 +109,7 @@ void leMsg(int * conexao, estrutura *dados)
 void enviaMsgClient(estrutura * dados, int * conexao)
 {
     
-    if (write(*conexao, &dados->crypto, MAX_MSG)< 0){
+    if (write(*conexao, &dados->crypto, strlen(dados->crypto))< 0){
         printf("Erro ao enviar");
         exit(1);
     }
