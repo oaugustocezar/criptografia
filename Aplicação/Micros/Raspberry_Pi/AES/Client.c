@@ -97,6 +97,8 @@ void recebeMsg(int * socket_desc, estrutura *dados)
 
 int main(int argc, char *argv[ ])
 {
+
+	extern int errno ;
 	setlocale(LC_ALL,"Portuguese");
 	
 	
@@ -104,6 +106,8 @@ int main(int argc, char *argv[ ])
 	int socket_desc;	
 	estrutura dados; 
 	FILE *pont_arq, *fp3;
+	
+	
 
 	
 
@@ -139,24 +143,36 @@ int main(int argc, char *argv[ ])
 
 		
 
-        pont_arq = fopen("tempos_exec_Client.csv", "a");
+        if(strcmp(argv[2],"-f") == 0){
+            pont_arq = fopen("tempos_exec_Client_Imagem.csv", "a");
+        }else{
+            pont_arq = fopen("tempos_exec_Client_String.csv", "a");
+        }
         if(EXP == 0)
-        	fprintf(pont_arq, "%s", "\n\n\nPC-PC,");
+        	if(fprintf(pont_arq, "%s", "\n\n\nPC-PC,") < 0)
+        		printf("Erro de gravação no arquivo\n");
         if(EXP == 1)
-        	fprintf(pont_arq, "%s", "\n\n\nPC-Placa,");
+        	if(fprintf(pont_arq, "%s", "\n\n\nPC-Placa,") < 0)
+        		printf("Erro de gravação no arquivo\n");
         if(EXP == 2)
-        	fprintf(pont_arq, "%s", "\n\n\nPlaca-Placa,");
+        	if (fprintf(pont_arq, "%s", "\n\n\nPlaca-Placa,") <0)
+        		printf("Erro de gravação no arquivo\n");
         if(KEY_LEN == 16){
-        	fprintf(pont_arq, "%s", "CHAVE 128 bits,");
+        	if(fprintf(pont_arq, "%s", "CHAVE 128 bits,") < 0)
+        		printf("Erro de gravação no arquivo\n");
         }else if(KEY_LEN == 24){
-        	fprintf(pont_arq, "%s", "CHAVE 192 bits,");
+        	if (fprintf(pont_arq, "%s", "CHAVE 192 bits,") < 0)
+        		printf("Erro de gravação no arquivo\n");
         }else if(KEY_LEN == 32){
-        	fprintf(pont_arq, "%s", "CHAVE 256 bits,");
+        	if (fprintf(pont_arq, "%s", "CHAVE 256 bits,") < 0)
+        		printf("Erro de gravação no arquivo\n");
         }
         if (strcmp(argv[2],"-f") == 0){
-        	fprintf(pont_arq, "%s", "Imagem\n");
+        	if (fprintf(pont_arq, "%s", "Imagem\n") < 0)
+        		printf("Erro de gravação no arquivo\n");
         }else{
-        	fprintf(pont_arq, "%s", "String\n");
+        	if(fprintf(pont_arq, "%s", "String\n") < 0)
+        		printf("Erro de gravação no arquivo\n");
         }
 
         fprintf(pont_arq, "%s", "No Exp.,");
@@ -185,15 +201,30 @@ int main(int argc, char *argv[ ])
 			dados.decryptedtext[strlen(dados.decryptedtext)] = '\0';
 		}		
 
-			gettimeofday(&utime, NULL);
+			if (ret_Val = gettimeofday(&utime, NULL) != 0){
 
-			T0 = utime.tv_sec + ( utime.tv_usec / 1000000.0 );
+				errnum = errno;
+				printf("Value of errno: %d\n", errno);
+      			perror("Error printed by perror");
+      			printf("Error opening file: %s\n", strerror( errnum ));
+			}else{
+				T0 = utime.tv_sec + ( utime.tv_usec / 1000000.0 );
+
+			}
+			
 			
 			enc(&dados,dados.decryptedtext); // criptografa mensagem 
 			
-			gettimeofday(&utime, NULL);
+			if (ret_Val = gettimeofday(&utime, NULL) != 0){
 
-		    T1 = utime.tv_sec + ( utime.tv_usec / 1000000.0 );
+				errnum = errno;
+				printf("Value of errno: %d\n", errno);
+      			perror("Error printed by perror");
+      			printf("Error opening file: %s\n", strerror( errnum ));
+			}else{
+				T1 = utime.tv_sec + ( utime.tv_usec / 1000000.0 );
+
+			}		    
 		    
 			
 			enviaMsgServer(&socket_desc,&dados); // envia mensagem para o servidor
@@ -202,28 +233,59 @@ int main(int argc, char *argv[ ])
 			recebeMsg(&socket_desc,&dados); //Recebendo resposta do servidor
 			
 			
-			gettimeofday(&utime, NULL); 
-			T6 = utime.tv_sec + ( utime.tv_usec / 1000000.0 ); 
+			if (ret_Val = gettimeofday(&utime, NULL) != 0){
+
+				errnum = errno;
+				printf("Value of errno: %d\n", errno);
+      			perror("Error printed by perror");
+      			printf("Error opening file: %s\n", strerror( errnum ));
+			}else{
+				T6 = utime.tv_sec + ( utime.tv_usec / 1000000.0 );
+
+			} 
 			
 			
 			dec(&dados); // decriptografa mensagem 
 			//printf("tamanho buffer %d",strlen(dados.decryptedtext));
 			
-			gettimeofday(&utime, NULL);
+			if (ret_Val = gettimeofday(&utime, NULL) != 0){
 
-		    T7 = utime.tv_sec + ( utime.tv_usec / 1000000.0 );
+				errnum = errno;
+				printf("Value of errno: %d\n", errno);
+      			perror("Error printed by perror");
+      			printf("Error opening file: %s\n", strerror( errnum ));
+			}else{
+				T7 = utime.tv_sec + ( utime.tv_usec / 1000000.0 );
 
-		    pont_arq = fopen("tempos_exec_Client.csv", "a");
-		    fprintf(pont_arq, "%s,", argv[1]);
+			}	
 
-		    fprintf(pont_arq, "%.10lf,", T1 - T0);
+		      if(strcmp(argv[2],"-f") == 0){
+            		pont_arq = fopen("tempos_exec_Client_Imagem.csv", "a");
+        	}else{
+            		pont_arq = fopen("tempos_exec_Client_String.csv", "a");
+        	}
+
+		    if (fprintf(pont_arq, "%s,", argv[1]) < 0 ){
+		    	printf("Erro de gravação no arquivo\n");
+		    	
+		    }
+
+
+		    if(fprintf(pont_arq, "%.10lf,", T1 - T0) < 0 ){
+		    	printf("Erro de gravação no arquivo\n");
+
+		    }	    
 		        
 			
 		    
-		    fprintf(pont_arq, "%.10lf,", T7 - T6);
+		    if(fprintf(pont_arq, "%.10lf,", T7 - T6) < 0){
+		    	printf("Erro de gravação no arquivo\n");
+		    }
 		        
 		    
-		    fprintf(pont_arq, "%.10lf\n", (T6-T1-(dados.DIFF_Server)/2));
+		    if (fprintf(pont_arq, "%.10lf\n", (T6-T1-(dados.DIFF_Server)/2)) < 0)
+		    	printf("Erro de gravação no arquivo\n");
+		    
 		    fclose(pont_arq);
 
 		    if (strcmp(argv[2],"-f") == 0){

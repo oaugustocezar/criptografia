@@ -1,7 +1,7 @@
 #ifndef CRYPTO_RASP
 #define CRYPTO_RASP
 
-#define KEY_LEN 32
+#define KEY_LEN 16
 #define EXP 0
 
 #define MAX_MSG 204800
@@ -26,9 +26,12 @@
 #include <relic_bc.h>
 #include <sys/time.h> 
 #include <locale.h>
+#include <errno.h>
 
 struct timeval utime;
     double T0,T1,T2,T3,T4,T5,T6,T7;
+
+int errnum,ret_Val;
     
     
 
