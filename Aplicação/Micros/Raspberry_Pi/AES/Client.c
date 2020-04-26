@@ -283,7 +283,7 @@ int main(int argc, char *argv[ ])
 		    }
 		        
 		    
-		    if (fprintf(pont_arq, "%.10lf\n", (T6-T1-(dados.DIFF_Server)/2)) < 0)
+		    if (fprintf(pont_arq, "%.10lf\n", (T6-T1-(dados.DIFF_Server))/2) < 0)
 		    	printf("Erro de gravação no arquivo\n");
 		    
 		    fclose(pont_arq);

@@ -1,7 +1,7 @@
 #ifndef CRYPTO_RASP
 #define CRYPTO_RASP
 
-#define KEY_LEN 16
+#define KEY_LEN 32
 #define EXP 0
 
 #define MAX_MSG 204800
