@@ -100,6 +100,8 @@ void leMsg(int * conexao, estrutura *dados)
             perror(RED"Erro ao receber dados do cliente: "RESET);
         
     }
+
+    
     
     
     }
@@ -132,7 +134,7 @@ int main(int argc, char *argv[ ])
     
     //variaveis
     
-    FILE *pont_arq;    
+    FILE *pont_arq, *fp3;    
     
     
     int socket_desc, conexao,in_len;
@@ -204,7 +206,12 @@ int main(int argc, char *argv[ ])
         socketServer(&socket_desc,&conexao); // cria e inicializa o socket, atribui endereços e escuta conexões  
     
         leMsg(&conexao,&dados); // lê mensagens enviadas pelo cliente
-        
+
+        dados.tamanho_in = dados.buffer;
+
+       
+
+
         if (ret_Val = gettimeofday(&utime, NULL) != 0){
 
                 errnum = errno;
@@ -227,9 +234,30 @@ int main(int argc, char *argv[ ])
             }else{
                 T3 = utime.tv_sec + ( utime.tv_usec / 1000000.0 );
 
-            }           
+            } 
 
-        
+
+
+             if (strcmp(argv[2],"-f") == 0){
+                //printf("tamanho buffer %ld", sizeof(dados.decryptedtext));
+
+                fp3 = fopen("confirmacaoServer.jpg","wb+"); 
+
+                fwrite (&dados.decryptedtext,1,MAX_MSG,fp3);
+
+                fclose(fp3);
+            }
+
+
+
+
+           
+            
+            
+
+
+
+        dados.tamanho_in = dados.buffer;
        
 
            

@@ -78,7 +78,7 @@ void recebeMsg(int * socket_desc, estrutura *dados)
 	if(DEBUG)
 		printf("Resposta recebida:");
 
-	dados->buffer = strlen(dados->crypto); /*atribui o tamanho do buffer*/
+	dados->tamanho_in = tamanho; /*atribui o tamanho do buffer*/
 				
 }
 			
@@ -189,7 +189,7 @@ int main(int argc, char *argv[ ])
 		{
 			FILE * fp;
 			fp = fopen (argv[3],"rb");
-			fread(&dados.decryptedtext,sizeof(uint8_t),MAX_MSG,fp);
+			dados.tamanho_in = fread(&dados.decryptedtext,sizeof(uint8_t),MAX_MSG,fp);
 			fclose(fp);
 		}else
 		{
@@ -199,6 +199,8 @@ int main(int argc, char *argv[ ])
 
 			strcpy(dados.decryptedtext,argv[2]);
 			dados.decryptedtext[strlen(dados.decryptedtext)] = '\0';
+			dados.tamanho_in  = strlen(dados.decryptedtext);
+
 		}		
 
 			if (ret_Val = gettimeofday(&utime, NULL) != 0){
@@ -231,6 +233,11 @@ int main(int argc, char *argv[ ])
 				
 			
 			recebeMsg(&socket_desc,&dados); //Recebendo resposta do servidor
+
+			//printf("\ndados.tamanho_in %d",dados.tamanho_in);
+			//printf("\ndados.buffer %d", dados.buffer);
+
+			dados.tamanho_in = dados.buffer;
 			
 			
 			if (ret_Val = gettimeofday(&utime, NULL) != 0){
@@ -247,6 +254,8 @@ int main(int argc, char *argv[ ])
 			
 			dec(&dados); // decriptografa mensagem 
 			//printf("tamanho buffer %d",strlen(dados.decryptedtext));
+
+			
 			
 			if (ret_Val = gettimeofday(&utime, NULL) != 0){
 

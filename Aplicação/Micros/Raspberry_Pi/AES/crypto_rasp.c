@@ -29,13 +29,15 @@
 	int out_len = MAX_MSG;
 	int in_len;
 	 
-	in_len = strlen(mensagem);
+	in_len = dados->tamanho_in;
+
+	//printf("\ntamanho do texto a ser criptografado %d\n",in_len);
 	 
 	 if(bc_aes_cbc_enc(dados->crypto,&out_len,mensagem,in_len,key,KEY_LEN,iv)) /* o texto é passado em mensagem e seu tamanho em in_len
 	 o texto criptografado é armazenado em dados->crypto e o tamanho da saida em out_len*/
 	{
 
-		printf(RED"ERRO\n"RESET);
+		printf(RED"ERRO NA CRIPTOGRAFIA\n"RESET);
 		exit(1);
 
 	}
@@ -47,6 +49,8 @@
 			printf("\n\nCriptografado com sucesso\n\n");
 
 	}
+
+	//printf("\nSaida dos dados na criptografia %d",out_len);
 	
 	 
 	
@@ -84,13 +88,16 @@ void dec (estrutura * dados)
 
    
     int out_len = MAX_MSG;
-    int in_len = dados->buffer;
+    int in_len = dados->tamanho_in;
+
+    //printf("\nentrada dos dados na decriptografia %d\n",in_len);
     
     if(bc_aes_cbc_dec(dados->decryptedtext,&out_len,dados->crypto,in_len,key,KEY_LEN,iv)) /*  descriptografa, passando o texto cifrado
     em dados->buffer e o tamanho em dados->buffer, armazena o texto puro em decryptedtext e o seu tamanho em out_len */
     {	
     	if(DEBUG)
-			printf(RED"ERRO\n"RESET);
+			printf(RED"ERRO NA DECRIPTOGRAFIA\n"RESET);
+		exit(1);
 	
 
 	}

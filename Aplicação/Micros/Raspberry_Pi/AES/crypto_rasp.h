@@ -4,7 +4,7 @@
 #define KEY_LEN 32
 #define EXP 0
 
-#define MAX_MSG 204800
+#define MAX_MSG 2048000
 #define DEBUG 0
 
 #define RED   "\x1B[31m"
@@ -38,7 +38,8 @@ int errnum,ret_Val;
     
 typedef struct {
 	
-	int16_t buffer; 
+	int buffer;
+	int tamanho_in; 
 	uint8_t crypto[MAX_MSG];
 	uint8_t decryptedtext[MAX_MSG];
 	double DIFF_Server;
