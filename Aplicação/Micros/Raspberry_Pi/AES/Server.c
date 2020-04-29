@@ -193,7 +193,7 @@ void enviaTempoClient(estrutura * dados, int * conexao)
 
     
     
-    if (write(*conexao, &dados->DIFF_Server, sizeof(dados->DIFF_Server))< 0){
+    if (write(*conexao, &dados->DIFF_Server, sizeof(dados->DIFF_Server)+1)< 0){
         printf(RED"Erro ao enviar"RESET);
         exit(1);
     }
@@ -206,7 +206,7 @@ void enviaTempoClient(estrutura * dados, int * conexao)
         
     }
 
-    
+    //printf("tamanho dos dados enviados: %d", tamanho);
 
     
 
