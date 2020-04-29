@@ -5,6 +5,8 @@
  void enc (estrutura * dados, uint8_t *mensagem)
  {
 
+ 	strcpy(dados->crypto,"\0");
+
  	uint8_t *key, *iv;
 
  	if(KEY_LEN == 16){
@@ -30,6 +32,9 @@
 	int in_len;
 	 
 	in_len = dados->tamanho_in;
+	dados->buffer =0;
+
+
 
 	//printf("\ntamanho do texto a ser criptografado %d\n",in_len);
 	 
@@ -37,7 +42,7 @@
 	 o texto criptografado é armazenado em dados->crypto e o tamanho da saida em out_len*/
 	{
 
-		printf(RED"ERRO NA CRIPTOGRAFIA\n"RESET);
+		printf(RED"\nERRO NA CRIPTOGRAFIA\n"RESET);
 		exit(1);
 
 	}
@@ -46,7 +51,7 @@
 	{
 		dados->buffer = out_len;
 		if(DEBUG) 
-			printf("\n\nCriptografado com sucesso\n\n");
+			printf(YEL "\n\nCriptografado com sucesso\n\n"RESET);
 
 	}
 
@@ -59,6 +64,7 @@
 
 void dec (estrutura * dados)
 {
+	strcpy(dados->decryptedtext,"\0");
 
 	uint8_t *key, *iv;
 
@@ -89,14 +95,17 @@ void dec (estrutura * dados)
    
     int out_len = MAX_MSG;
     int in_len = dados->tamanho_in;
+    dados->buffer = 0;
+
+
 
     //printf("\nentrada dos dados na decriptografia %d\n",in_len);
     
     if(bc_aes_cbc_dec(dados->decryptedtext,&out_len,dados->crypto,in_len,key,KEY_LEN,iv)) /*  descriptografa, passando o texto cifrado
     em dados->buffer e o tamanho em dados->buffer, armazena o texto puro em decryptedtext e o seu tamanho em out_len */
     {	
-    	if(DEBUG)
-			printf(RED"ERRO NA DECRIPTOGRAFIA\n"RESET);
+    	
+		printf(RED"\nERRO NA DECRIPTOGRAFIA\n"RESET);
 		exit(1);
 	
 
@@ -104,15 +113,17 @@ void dec (estrutura * dados)
 	else
 	{
 		dados->buffer = out_len;
-		//printf("buffer %d",dados->buffer);
+		printf("\nbuffer %d",dados->buffer);
 		if(DEBUG)
-			printf("\n\nDescriptografado com sucesso\n\n");
+			printf(YEL "\n\nDescriptografado com sucesso\n\n"RESET);
 
 	}
 
+
+
 	
     
-    if(DEBUG)
-    	printf("O cliente falou: %s\n", dados->decryptedtext); 
+    /*if(DEBUG)
+    	printf("O cliente falou: %s\n", dados->decryptedtext); */
         
  }      

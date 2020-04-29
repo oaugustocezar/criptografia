@@ -88,19 +88,60 @@ void socketServer (int * socket_desc, int *conexao)
         
 }
 
-void leMsg(int * conexao, estrutura *dados)
+void leBytes(int * conexao, estrutura *dados)
 {
-    int tamanho;
+    int tamanho = 0;
+    dados->tamanho_in = 0;
     // lendo dados enviados pelo cliente
           
-    
-    if ((tamanho = read(*conexao, dados, MAX_MSG)) < 0)
-    {
-        
-            perror(RED"Erro ao receber dados do cliente: "RESET);
-        
+    while (tamanho < 4){
+
+            if ((tamanho = read(*conexao, &dados->tamanho_in, 4)) < 0)
+        {
+            
+                perror(RED"Erro ao receber dados do cliente: "RESET);
+            
+        }else {
+            if(DEBUG)
+                printf("\nDados Recebidos");
+        }
+
+
     }
 
+    //printf("tamanho recebido %d\n",dados->tamanho_in);
+    
+    
+    
+    
+    }
+
+
+    void leMsg(int * conexao, estrutura *dados)
+{
+    int tamanho = 0;
+    // lendo dados enviados pelo cliente
+    strcpy(dados->crypto,"\0");
+          
+    while (tamanho < dados->tamanho_in){
+
+            if ((tamanho = read(*conexao, &dados->crypto, dados->tamanho_in)) < 0)
+        {
+            
+                perror(RED"Erro ao receber dados do cliente: "RESET);
+            
+        }else{
+            if(DEBUG)
+                printf("\nDados Recebidos");
+        }
+
+
+    }
+
+    
+
+
+    
     
     
     
@@ -112,7 +153,7 @@ void leMsg(int * conexao, estrutura *dados)
 void enviaMsgClient(estrutura * dados, int * conexao)
 {
     
-    if (write(*conexao, &dados->crypto, MAX_MSG)< 0){
+    if (write(*conexao, &dados->crypto, dados->buffer +1)< 0){
         printf(RED"Erro ao enviar"RESET);
         exit(1);
     }
@@ -123,6 +164,51 @@ void enviaMsgClient(estrutura * dados, int * conexao)
         }
         
     }
+
+
+}
+
+
+void enviaBytesClient(estrutura * dados, int * conexao)
+{
+    
+    if (write(*conexao, &dados->buffer, 4)< 0){
+        printf(RED"Erro ao enviar"RESET);
+        exit(1);
+    }
+    else {
+        if(DEBUG){
+            printf("Enviado com sucesso\n");
+
+        }
+        
+    }
+
+
+}
+
+
+void enviaTempoClient(estrutura * dados, int * conexao)
+{
+
+    
+    
+    if (write(*conexao, &dados->DIFF_Server, sizeof(dados->DIFF_Server))< 0){
+        printf(RED"Erro ao enviar"RESET);
+        exit(1);
+    }
+    else {
+        if(DEBUG){
+            printf("tempo Enviado com sucesso\n");
+            //printf("tempo enviado %.10f",dados->DIFF_Server );
+
+        }
+        
+    }
+
+    
+
+    
 
 
 }
@@ -142,6 +228,16 @@ int main(int argc, char *argv[ ])
     
     uint8_t mensagem[MAX_MSG];
     estrutura dados;
+
+    strcpy(dados.crypto,"\0");
+    strcpy(dados.decryptedtext,"\0");
+    dados.buffer = 0;
+    dados.tamanho_in = 0;
+    dados.DIFF_Server = 0.0;
+    
+
+
+
 
    if(atoi(argv[1]) == 0){
 
@@ -204,10 +300,13 @@ int main(int argc, char *argv[ ])
     }else {
         
         socketServer(&socket_desc,&conexao); // cria e inicializa o socket, atribui endereços e escuta conexões  
+
+        leBytes(&conexao,&dados);
+
     
         leMsg(&conexao,&dados); // lê mensagens enviadas pelo cliente
 
-        dados.tamanho_in = dados.buffer;
+        //dados.tamanho_in = dados.buffer;
 
        
 
@@ -249,14 +348,6 @@ int main(int argc, char *argv[ ])
             }
 
 
-
-
-           
-            
-            
-
-
-
         dados.tamanho_in = dados.buffer;
        
 
@@ -289,9 +380,18 @@ int main(int argc, char *argv[ ])
             }           
         
 
-        dados.DIFF_Server = T5 - T2 ;  
+        enviaBytesClient(&dados,&conexao);
+        //printf("\nBytes enviados %d", dados.buffer);
         
-        enviaMsgClient(&dados,&conexao); // envia mensagem para o cliente 
+        enviaMsgClient(&dados,&conexao); // envia mensagem para o cliente
+
+        dados.DIFF_Server = T5 - T2 ;  
+
+        enviaTempoClient(&dados,&conexao);
+         
+        
+
+        printf("\nTempo enviado %.10f",dados.DIFF_Server);
 
 
          if(strcmp(argv[2],"-f") == 0){

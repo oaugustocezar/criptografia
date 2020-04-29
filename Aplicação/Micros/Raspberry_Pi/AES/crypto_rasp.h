@@ -28,6 +28,7 @@
 #include <locale.h>
 #include <errno.h>
 
+
 struct timeval utime;
     double T0,T1,T2,T3,T4,T5,T6,T7;
 

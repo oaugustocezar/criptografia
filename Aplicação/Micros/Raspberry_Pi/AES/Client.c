@@ -50,10 +50,10 @@
 	
 }	
 	 
- void enviaMsgServer (int * socket_desc, estrutura *dados)
+ void enviaBytesServer (int * socket_desc, estrutura *dados)
 {
 	 
-	if (send(*socket_desc, dados, MAX_MSG, 0) < 0)  // envia o texto cifrado para  server
+	if (send(*socket_desc, &dados->buffer, sizeof(dados->buffer), 0) < 0)  // envia o texto cifrado para  server
 	{
 		printf(RED"Erro ao enviar mensagem\n"RESET);
 		exit(1);
@@ -61,15 +61,93 @@
 	if(DEBUG)
 		puts("Dados enviados\n");
 }
+
+
+void enviaMsgServer (int * socket_desc, estrutura *dados)
+{
+	 
+	if (send(*socket_desc, &dados->crypto, dados->buffer + 1 , 0) < 0)  // envia o texto cifrado para  server
+	{
+		printf(RED"Erro ao enviar mensagem\n"RESET);
+		exit(1);
+	}
+	if(DEBUG)
+		puts("Dados enviados\n");
+}
+
 	 
 
 		
+void recebeBytes(int * socket_desc, estrutura *dados)
+{
+
+	int tamanho;
+
+	tamanho = 0;
+	dados->tamanho_in = 0;
+
+	while(tamanho < 4){
+
+			if ((tamanho = recv(*socket_desc, &dados->tamanho_in, 4, 0)) < 0) /* envia os bytes em dados->crypto*/
+		{
+			printf("Falha ao receber resposta\n");
+			exit(1);
+				
+		}
+		if(DEBUG)
+			printf("Resposta recebida:");
+
+	}
+	
+
+	
+				
+}
+
+
+
+void recebeTempo(int * socket_desc, estrutura *dados)
+{
+
+	int tamanho;
+
+	tamanho = 0;
+	
+	
+
+	while(tamanho < 8){
+
+			if ((tamanho = recv(*socket_desc, &dados->DIFF_Server,8 , 0)) < 0) /* envia os bytes em dados->crypto*/
+		{
+			printf("Falha ao receber resposta\n");
+			exit(1);
+				
+		}
+		if(DEBUG)
+			printf("Resposta recebida:");
+
+	}
+
+	//printf("tamanho do double %ld", sizeof(dados->DIFF_Server));
+	
+
+	
+				
+}
+
+
 void recebeMsg(int * socket_desc, estrutura *dados)
 {
 
 	int tamanho;
+
+	tamanho = 0;
+	strcpy(dados->crypto,"\0");
+
+	while(tamanho < dados->tamanho_in)
+
 						
-	if ((tamanho = recv(*socket_desc, dados->crypto, MAX_MSG, 0)) < 0) /* envia os bytes em dados->crypto*/
+	if ((tamanho = recv(*socket_desc, &dados->crypto, dados->tamanho_in, 0)) < 0) /* envia os bytes em dados->crypto*/
 	{
 		printf("Falha ao receber resposta\n");
 		exit(1);
@@ -106,6 +184,12 @@ int main(int argc, char *argv[ ])
 	int socket_desc;	
 	estrutura dados; 
 	FILE *pont_arq, *fp3;
+
+	strcpy(dados.crypto,"\0");
+    strcpy(dados.decryptedtext,"\0");
+    dados.buffer = 0;
+    dados.tamanho_in = 0;
+    dados.DIFF_Server = 0.0;
 	
 	
 
@@ -133,6 +217,9 @@ int main(int argc, char *argv[ ])
 	}else{
 		printf(MAG"\nExp no %s iniciado\n"RESET,argv[1]);
 	}
+
+	strcpy(dados.decryptedtext,"\0");
+
 
 	
 
@@ -226,18 +313,31 @@ int main(int argc, char *argv[ ])
 			}else{
 				T1 = utime.tv_sec + ( utime.tv_usec / 1000000.0 );
 
-			}		    
-		    
+			}
+
+			enviaBytesServer(&socket_desc,&dados);
 			
 			enviaMsgServer(&socket_desc,&dados); // envia mensagem para o servidor
-				
+
+			recebeBytes(&socket_desc,&dados);				
 			
 			recebeMsg(&socket_desc,&dados); //Recebendo resposta do servidor
+			//printf("teste");
+			
 
 			//printf("\ndados.tamanho_in %d",dados.tamanho_in);
 			//printf("\ndados.buffer %d", dados.buffer);
 
+
+
 			dados.tamanho_in = dados.buffer;
+
+			//printf("dados antes da decriptografa %d",dados.tamanho_in);
+
+			recebeTempo(&socket_desc,&dados);
+			printf("\nTempo recebebido %.10f",dados.DIFF_Server);
+			
+
 			
 			
 			if (ret_Val = gettimeofday(&utime, NULL) != 0){
@@ -266,7 +366,9 @@ int main(int argc, char *argv[ ])
 			}else{
 				T7 = utime.tv_sec + ( utime.tv_usec / 1000000.0 );
 
-			}	
+			}
+
+			
 
 		      if(strcmp(argv[2],"-f") == 0){
             		pont_arq = fopen("tempos_exec_Client_Imagem.csv", "a");
@@ -290,6 +392,10 @@ int main(int argc, char *argv[ ])
 		    if(fprintf(pont_arq, "%.10lf,", T7 - T6) < 0){
 		    	printf("Erro de gravação no arquivo\n");
 		    }
+
+
+
+
 		        
 		    
 		    if (fprintf(pont_arq, "%.10lf\n", (T6-T1-(dados.DIFF_Server))/2) < 0)
