@@ -94,7 +94,7 @@ void leBytes(int * conexao, estrutura *dados)
     dados->tamanho_in = 0;
     // lendo dados enviados pelo cliente
           
-    while (tamanho < 4){
+    
 
             if ((tamanho = read(*conexao, &dados->tamanho_in, 4)) < 0)
         {
@@ -107,7 +107,7 @@ void leBytes(int * conexao, estrutura *dados)
         }
 
 
-    }
+    
 
     //printf("tamanho recebido %d\n",dados->tamanho_in);
     
@@ -122,10 +122,18 @@ void leBytes(int * conexao, estrutura *dados)
     int tamanho = 0;
     // lendo dados enviados pelo cliente
     strcpy(dados->crypto,"\0");
-          
-    while (tamanho < dados->tamanho_in){
 
-            if ((tamanho = read(*conexao, &dados->crypto, dados->tamanho_in)) < 0)
+
+
+    while(tamanho < dados->tamanho_in)
+    {
+      tamanho += read(*conexao, &dados->crypto+tamanho, dados->tamanho_in);
+      
+    }
+          
+    
+
+        /*    if ((tamanho = read(*conexao, &dados->crypto, dados->tamanho_in)) < 0)
         {
             
                 perror(RED"Erro ao receber dados do cliente: "RESET);
@@ -133,10 +141,10 @@ void leBytes(int * conexao, estrutura *dados)
         }else{
             if(DEBUG)
                 printf("\nDados Recebidos");
-        }
+        }*/
 
 
-    }
+    
 
     
 
@@ -153,7 +161,7 @@ void leBytes(int * conexao, estrutura *dados)
 void enviaMsgClient(estrutura * dados, int * conexao)
 {
     
-    if (write(*conexao, &dados->crypto, dados->buffer +1)< 0){
+    if (write(*conexao, &dados->crypto, dados->buffer)< 0){
         printf(RED"Erro ao enviar"RESET);
         exit(1);
     }
@@ -193,7 +201,7 @@ void enviaTempoClient(estrutura * dados, int * conexao)
 
     
     
-    if (write(*conexao, &dados->DIFF_Server, sizeof(dados->DIFF_Server)+1)< 0){
+    if (write(*conexao, &dados->DIFF_Server, sizeof(dados->DIFF_Server))< 0){
         printf(RED"Erro ao enviar"RESET);
         exit(1);
     }
@@ -342,7 +350,7 @@ int main(int argc, char *argv[ ])
 
                 fp3 = fopen("confirmacaoServer.jpg","wb+"); 
 
-                fwrite (&dados.decryptedtext,1,MAX_MSG,fp3);
+                fwrite (&dados.decryptedtext,1,dados.buffer,fp3);
 
                 fclose(fp3);
             }
@@ -391,7 +399,7 @@ int main(int argc, char *argv[ ])
          
         
 
-        printf("\nTempo enviado %.10f",dados.DIFF_Server);
+        //printf("\nTempo enviado %.10f",dados.DIFF_Server);
 
 
          if(strcmp(argv[2],"-f") == 0){

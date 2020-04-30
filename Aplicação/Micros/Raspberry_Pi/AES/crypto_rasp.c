@@ -113,7 +113,7 @@ void dec (estrutura * dados)
 	else
 	{
 		dados->buffer = out_len;
-		printf("\nbuffer %d",dados->buffer);
+		//printf("\nbuffer %d",dados->buffer);
 		if(DEBUG)
 			printf(YEL "\n\nDescriptografado com sucesso\n\n"RESET);
 

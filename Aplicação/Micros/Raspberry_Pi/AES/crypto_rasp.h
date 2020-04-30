@@ -4,7 +4,7 @@
 #define KEY_LEN 32
 #define EXP 0
 
-#define MAX_MSG 2048000
+#define MAX_MSG 500000
 #define DEBUG 0
 
 #define RED   "\x1B[31m"

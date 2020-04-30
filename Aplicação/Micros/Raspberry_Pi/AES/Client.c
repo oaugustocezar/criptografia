@@ -66,7 +66,7 @@
 void enviaMsgServer (int * socket_desc, estrutura *dados)
 {
 	 
-	if (send(*socket_desc, &dados->crypto, dados->buffer + 1 , 0) < 0)  // envia o texto cifrado para  server
+	if (send(*socket_desc, &dados->crypto, dados->buffer , 0) < 0)  // envia o texto cifrado para  server
 	{
 		printf(RED"Erro ao enviar mensagem\n"RESET);
 		exit(1);
@@ -74,6 +74,8 @@ void enviaMsgServer (int * socket_desc, estrutura *dados)
 	if(DEBUG)
 		puts("Dados enviados\n");
 }
+
+
 
 	 
 
@@ -86,7 +88,7 @@ void recebeBytes(int * socket_desc, estrutura *dados)
 	tamanho = 0;
 	dados->tamanho_in = 0;
 
-	while(tamanho < 4){
+	
 
 			if ((tamanho = recv(*socket_desc, &dados->tamanho_in, 4, 0)) < 0) /* envia os bytes em dados->crypto*/
 		{
@@ -95,9 +97,9 @@ void recebeBytes(int * socket_desc, estrutura *dados)
 				
 		}
 		if(DEBUG)
-			printf("Resposta recebida:");
+			printf("\nBytes recebidos");
 
-	}
+	
 	
 
 	
@@ -115,7 +117,7 @@ void recebeTempo(int * socket_desc, estrutura *dados)
 	
 	
 
-	while(tamanho < 8){
+	
 
 			if ((tamanho = recv(*socket_desc, &dados->DIFF_Server,8 , 0)) < 0) /* envia os bytes em dados->crypto*/
 		{
@@ -124,9 +126,9 @@ void recebeTempo(int * socket_desc, estrutura *dados)
 				
 		}
 		if(DEBUG)
-			printf("Resposta recebida:");
+			printf("\nTempo recebido recebida:");
 
-	}
+	
 
 	//printf("tamanho do double %ld", sizeof(dados->DIFF_Server));
 	
@@ -144,7 +146,7 @@ void recebeMsg(int * socket_desc, estrutura *dados)
 	tamanho = 0;
 	strcpy(dados->crypto,"\0");
 
-	while(tamanho < dados->tamanho_in)
+	
 
 						
 	if ((tamanho = recv(*socket_desc, &dados->crypto, dados->tamanho_in, 0)) < 0) /* envia os bytes em dados->crypto*/
@@ -154,7 +156,7 @@ void recebeMsg(int * socket_desc, estrutura *dados)
 			
 	}
 	if(DEBUG)
-		printf("Resposta recebida:");
+		printf("\nMensagem recebida:");
 
 	dados->tamanho_in = tamanho; /*atribui o tamanho do buffer*/
 				
@@ -300,6 +302,8 @@ int main(int argc, char *argv[ ])
 				T0 = utime.tv_sec + ( utime.tv_usec / 1000000.0 );
 
 			}
+
+			//printf("dados de entrada %d", dados.tamanho_in);
 			
 			
 			enc(&dados,dados.decryptedtext); // criptografa mensagem 
@@ -335,7 +339,7 @@ int main(int argc, char *argv[ ])
 			//printf("dados antes da decriptografa %d",dados.tamanho_in);
 
 			recebeTempo(&socket_desc,&dados);
-			printf("\nTempo recebebido %.10f",dados.DIFF_Server);
+			//printf("\nTempo recebebido %.10f",dados.DIFF_Server);
 			
 
 			
@@ -408,7 +412,7 @@ int main(int argc, char *argv[ ])
 
 		    	fp3 = fopen("confirmacao.jpg","wb+"); 
 
-  				fwrite (&dados.decryptedtext,1,MAX_MSG,fp3);
+  				fwrite (&dados.decryptedtext,1,dados.buffer,fp3);
 
   				fclose(fp3);
 		    }
