@@ -93,10 +93,13 @@ void leBytes(int * conexao, estrutura *dados)
     int tamanho = 0;
     dados->tamanho_in = 0;
     // lendo dados enviados pelo cliente
+
+
+
           
     
 
-            if ((tamanho = read(*conexao, &dados->tamanho_in, 4)) < 0)
+           if ((tamanho = read(*conexao, &dados->tamanho_in, 4)) < 0)
         {
             
                 perror(RED"Erro ao receber dados do cliente: "RESET);
@@ -109,7 +112,7 @@ void leBytes(int * conexao, estrutura *dados)
 
     
 
-    //printf("tamanho recebido %d\n",dados->tamanho_in);
+    printf("tamanho recebido %d\n",dados->tamanho_in);
     
     
     
@@ -127,9 +130,12 @@ void leBytes(int * conexao, estrutura *dados)
 
     while(tamanho < dados->tamanho_in)
     {
-      tamanho += read(*conexao, &dados->crypto+tamanho, dados->tamanho_in);
+
+     tamanho += read(*conexao, dados->crypto+tamanho, dados->tamanho_in);
       
     }
+
+    printf("tamanho da mensagem recebida %d", tamanho);
           
     
 

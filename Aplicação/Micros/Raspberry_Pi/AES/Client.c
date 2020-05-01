@@ -149,7 +149,7 @@ void recebeMsg(int * socket_desc, estrutura *dados)
 	
 
 						
-	if ((tamanho = recv(*socket_desc, &dados->crypto, dados->tamanho_in, 0)) < 0) /* envia os bytes em dados->crypto*/
+	if ((tamanho = recv(*socket_desc, dados->crypto, dados->tamanho_in, 0)) < 0) /* envia os bytes em dados->crypto*/
 	{
 		printf("Falha ao receber resposta\n");
 		exit(1);

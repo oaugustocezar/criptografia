@@ -6,11 +6,11 @@ gcc crypto_rasp.c Client.c \
     -o client.run 
 
 
-	for i in {0..50}
+	: 'for i in {0..50}
 do
 	./client.run $i "criptografando mensagens para realizar testes de tempo de criptografia e decriptografia em um sistema de comunicação cliente-servidorcriptografando mensagens para realizar testes de tempo de criptografia e decriptografia em um sistema de comunicação cliente-servidorcriptografando mensagens para realizar testes de tempo de criptografia e decriptografia em um sistema de comunicação cliente-servidorcriptografando mensagens para realizar testes de tempo de criptografia e decriptografia em um sistema de comunicação cliente-servidorcriptografando mensagens para realizar testes de tempo de criptografia e decriptografia em um sistema de comunicação cliente-servidorcriptografando mensagens para realizar testes de tempo de criptografia e decriptografia em um sistema de comunicação cliente-servidorcriptografando mensagens para realizar testes de tempo de criptografia e decriptografia em um sistema de comunicação cliente-servidorcriptografando mensagens para realizar testes de tempo de criptografia e decriptografia em um sistema de comunicação cliente-servidorcriptografando mensagens para realizar testes de tempo de criptografia e decriptografia em um sistema de comunicação cliente-servidor" 127.0.0.1
 	sleep 3s
-done
+done'
 	for i in {0..50}
 do
 	./client.run $i -f /home/augusto/Documentos/criptografia/Aplicação/Micros/Raspberry_Pi/AES/Imagens/foto.jpg 127.0.0.1
