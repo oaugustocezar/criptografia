@@ -59,23 +59,22 @@
 		exit(1);
 	}
 	if(DEBUG)
-		puts("Dados enviados\n");
+		puts("Tamanho enviado ao servidor\n");
 }
 
 
 void enviaMsgServer (int * socket_desc, estrutura *dados)
 {
+	
 	 
-	if (send(*socket_desc, &dados->crypto, dados->buffer , 0) < 0)  // envia o texto cifrado para  server
+	if (send(*socket_desc, dados->crypto, dados->buffer , 0) < 0)  // envia o texto cifrado para  server
 	{
 		printf(RED"Erro ao enviar mensagem\n"RESET);
 		exit(1);
 	}
 	if(DEBUG)
-		puts("Dados enviados\n");
+		printf("Mensagem criptograda enviada\n");
 }
-
-
 
 	 
 
@@ -87,6 +86,7 @@ void recebeBytes(int * socket_desc, estrutura *dados)
 
 	tamanho = 0;
 	dados->tamanho_in = 0;
+	memset(&dados->tamanho_in, 0, sizeof(dados->tamanho_in));
 
 	
 
@@ -97,14 +97,14 @@ void recebeBytes(int * socket_desc, estrutura *dados)
 				
 		}
 		if(DEBUG)
-			printf("\nBytes recebidos");
+			printf("Tamanho recebido do cliente %d\n", dados->tamanho_in);
 
-	
+	}
 	
 
 	
 				
-}
+
 
 
 
@@ -114,19 +114,30 @@ void recebeTempo(int * socket_desc, estrutura *dados)
 	int tamanho;
 
 	tamanho = 0;
+
+
+	while(tamanho < 8)
+    {
+      
+        tamanho += recv(*socket_desc, &dados->DIFF_Server+tamanho, 8,0);
+
+
+        
+      
+    }
 	
 	
 
 	
 
-			if ((tamanho = recv(*socket_desc, &dados->DIFF_Server,8 , 0)) < 0) /* envia os bytes em dados->crypto*/
+			/*if ((tamanho = recv(*socket_desc, &dados->DIFF_Server,8 , 0)) < 0) /* envia os bytes em dados->crypto
 		{
 			printf("Falha ao receber resposta\n");
 			exit(1);
 				
 		}
 		if(DEBUG)
-			printf("\nTempo recebido recebida:");
+			printf("Resposta recebida:");*/
 
 	
 
@@ -144,19 +155,33 @@ void recebeMsg(int * socket_desc, estrutura *dados)
 	int tamanho;
 
 	tamanho = 0;
-	strcpy(dados->crypto,"\0");
+	memset(&dados->crypto, 0, dados->tamanho_in);
+
+
+
+	while(tamanho < dados->tamanho_in)
+    {
+      
+        tamanho += recv(*socket_desc, dados->crypto+tamanho, dados->tamanho_in+8,0);
+
+        
+      
+    }
+    if(DEBUG)
+    	printf("Mensagem criptograda recebida de tamanho %d\n", tamanho);
 
 	
 
 						
-	if ((tamanho = recv(*socket_desc, dados->crypto, dados->tamanho_in, 0)) < 0) /* envia os bytes em dados->crypto*/
+	/*if ((tamanho = recv(*socket_desc, dados->crypto, dados->tamanho_in, 0)) < 0) /* envia os bytes em dados->crypto
 	{
 		printf("Falha ao receber resposta\n");
 		exit(1);
 			
 	}
 	if(DEBUG)
-		printf("\nMensagem recebida:");
+		printf("Mensagem criptograda recebida de tamanho %d", tamanho);*/
+
 
 	dados->tamanho_in = tamanho; /*atribui o tamanho do buffer*/
 				
@@ -185,7 +210,7 @@ int main(int argc, char *argv[ ])
 	// variaveis
 	int socket_desc;	
 	estrutura dados; 
-	FILE *pont_arq, *fp3;
+	FILE *pont_arq, *fp3,*fp2;
 
 	strcpy(dados.crypto,"\0");
     strcpy(dados.decryptedtext,"\0");
@@ -269,6 +294,52 @@ int main(int argc, char *argv[ ])
         fprintf(pont_arq, "%s", "Tempo decriptografia cliente em ms:,");
         fprintf(pont_arq, "%s", "Tempo de envio entre os nos em ms:\n");
         fclose(pont_arq);
+
+
+        if(strcmp(argv[1],"0") == 0)
+	{
+
+		
+
+        if(strcmp(argv[2],"-f") == 0){
+            fp2 = fopen("Tempos_SEP_Client_Imagem.csv", "a");
+        }else{
+            fp2 = fopen("Tempos_SEP_Client_String.csv", "a");
+        }
+        if(EXP == 0)
+        	if(fprintf(fp2, "%s", "\n\n\nPC-PC,") < 0)
+        		printf("Erro de gravação no arquivo\n");
+        if(EXP == 1)
+        	if(fprintf(fp2, "%s", "\n\n\nPC-Placa,") < 0)
+        		printf("Erro de gravação no arquivo\n");
+        if(EXP == 2)
+        	if (fprintf(fp2, "%s", "\n\n\nPlaca-Placa,") <0)
+        		printf("Erro de gravação no arquivo\n");
+        if(KEY_LEN == 16){
+        	if(fprintf(fp2, "%s", "CHAVE 128 bits,") < 0)
+        		printf("Erro de gravação no arquivo\n");
+        }else if(KEY_LEN == 24){
+        	if (fprintf(fp2, "%s", "CHAVE 192 bits,") < 0)
+        		printf("Erro de gravação no arquivo\n");
+        }else if(KEY_LEN == 32){
+        	if (fprintf(fp2, "%s", "CHAVE 256 bits,") < 0)
+        		printf("Erro de gravação no arquivo\n");
+        }
+        if (strcmp(argv[2],"-f") == 0){
+        	if (fprintf(fp2, "%s", "Imagem\n") < 0)
+        		printf("Erro de gravação no arquivo\n");
+        }else{
+        	if(fprintf(fp2, "%s", "String\n") < 0)
+        		printf("Erro de gravação no arquivo\n");
+        }
+
+        fprintf(fp2, "%s", "No Exp.,");
+        fprintf(fp2, "%s","T0,");
+        fprintf(fp2, "%s", "T1,");
+        fprintf(fp2, "%s", "T6,");
+        fprintf(fp2, "%s", "T7\n");
+        fclose(fp2);
+    }
        
 
 	}else
@@ -302,8 +373,6 @@ int main(int argc, char *argv[ ])
 				T0 = utime.tv_sec + ( utime.tv_usec / 1000000.0 );
 
 			}
-
-			//printf("dados de entrada %d", dados.tamanho_in);
 			
 			
 			enc(&dados,dados.decryptedtext); // criptografa mensagem 
@@ -326,6 +395,10 @@ int main(int argc, char *argv[ ])
 			recebeBytes(&socket_desc,&dados);				
 			
 			recebeMsg(&socket_desc,&dados); //Recebendo resposta do servidor
+			//sleep(1);
+			recebeTempo(&socket_desc,&dados);
+			//printf("\nTempo recebebido %.10f",dados.DIFF_Server);
+			
 			//printf("teste");
 			
 
@@ -338,8 +411,6 @@ int main(int argc, char *argv[ ])
 
 			//printf("dados antes da decriptografa %d",dados.tamanho_in);
 
-			recebeTempo(&socket_desc,&dados);
-			//printf("\nTempo recebebido %.10f",dados.DIFF_Server);
 			
 
 			
@@ -389,13 +460,17 @@ int main(int argc, char *argv[ ])
 		    if(fprintf(pont_arq, "%.10lf,", T1 - T0) < 0 ){
 		    	printf("Erro de gravação no arquivo\n");
 
-		    }	    
+		    }
+
 		        
 			
 		    
 		    if(fprintf(pont_arq, "%.10lf,", T7 - T6) < 0){
 		    	printf("Erro de gravação no arquivo\n");
 		    }
+
+		    //printf("%s",argv[5]);
+
 
 
 
@@ -407,24 +482,72 @@ int main(int argc, char *argv[ ])
 		    
 		    fclose(pont_arq);
 
-		    if (strcmp(argv[2],"-f") == 0){
-		    	//printf("tamanho buffer %ld", sizeof(dados.decryptedtext));
 
-		    	fp3 = fopen("confirmacao.jpg","wb+"); 
+
+		    if(strcmp(argv[2],"-f") == 0){
+            		fp2 = fopen("Tempos_SEP_Client_Imagem.csv", "a");
+        	}else{
+            		fp2 = fopen("Tempos_SEP_Client_String.csv", "a");
+        	}
+
+		    if (fprintf(fp2, "%s,", argv[1]) < 0 ){
+		    	printf("Erro de gravação no arquivo\n");
+		    	
+		    }
+
+
+		    if(fprintf(fp2, "%.10lf,",T0) < 0 ){
+		    	printf("Erro de gravação no arquivo\n");
+
+		    }	    
+		        
+			
+		    
+		    if(fprintf(fp2, "%.10lf,", T1) < 0){
+		    	printf("Erro de gravação no arquivo\n");
+		    }
+
+		    //printf("%s",argv[5]);
+
+
+
+
+
+		        
+		    
+		    if (fprintf(fp2, "%.10lf,", T6) < 0)
+		    	printf("Erro de gravação no arquivo\n");
+
+		    if (fprintf(fp2, "%.10lf\n", T7) < 0)
+		    	printf("Erro de gravação no arquivo\n");
+
+		    
+		    fclose(fp2);
+		    
+
+		    if (strcmp(argv[2],"-f") == 0){
+		    	
+
+		    	fp3 = fopen(argv[5],"wb+"); 
 
   				fwrite (&dados.decryptedtext,1,dados.buffer,fp3);
 
   				fclose(fp3);
+		    }else{
+
+		    	fp3 = fopen(argv[6],"wb+"); 
+
+  				fwrite (&dados.decryptedtext,1,dados.buffer,fp3);
+
+  				fclose(fp3);
+
 		    }
-		    
-		    
 
 
-
-	}
-
+		  
 
 
+}
 	fechaSocket(&socket_desc); // encerra a comunicação	
 	if(atoi(argv[1]) == 0){
 
